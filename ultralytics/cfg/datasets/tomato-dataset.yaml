@@ -1,0 +1,47 @@
+# 番茄果串检测数据集配置示例
+# 支持相对高度和聚类ID信息
+# YOLOv12-Tomato 专用
+
+# 路径配置
+path: ../datasets/tomato  # 数据集根目录
+train: images/train       # 训练集图像目录
+val: images/val           # 验证集图像目录
+test: images/test         # 测试集图像目录
+
+# 标签格式：<class_id> <x_center> <y_center> <width> <height> <cluster_id> <h_rel>
+# 注：果串类别(4-5)的h_rel值应设为-1表示无意义；单果类别(0-3)的h_rel范围为0~1，0表示串顶，1表示串底
+
+# 类别信息 (番茄成熟度)
+nc: 6  # 类别数（4个果实类别 + 2个串类别）
+names:
+  0: Fully_Ripe     # 完全成熟番茄
+  1: Ripe           # 成熟番茄
+  2: Breaking       # 转色期番茄
+  3: Green          # 未成熟绿色番茄
+  4: Ripe_Bunch     # 成熟果串
+  5: Unripe_Bunch   # 未成熟果串
+
+# 特殊配置标志
+has_cluster_id: True      # 启用果串聚类ID
+has_h_rel: True           # 启用相对高度
+
+# 训练配置建议
+train_cfg:
+  loss: 'TomatoDetectWithRankLoss(lambda_pos=0.3, lambda_rank=0.2, lambda_conf=0.4, margin=0.05)'  # 损失函数设置
+  model: ultralytics/cfg/models/v12/yolov12-tomato.yaml  # 模型配置
+  workers: 8               # 数据加载工作线程数
+  batch_size: 16           # 批次大小
+  imgsz: 640               # 图像尺寸
+  epochs: 100              # 训练轮数
+  patience: 50             # 早停耐心值
+  optimizer: 'AdamW'       # 优化器
+  lr0: 0.001               # 初始学习率
+  lrf: 0.01                # 最终学习率因子
+  momentum: 0.937          # 动量
+  weight_decay: 0.0005     # 权重衰减
+  warmup_epochs: 3.0       # 预热轮数
+  warmup_momentum: 0.8     # 预热动量
+  warmup_bias_lr: 0.1      # 预热偏置学习率
+  close_mosaic: 10         # 关闭马赛克增强的轮数
+  label_smoothing: 0.0     # 标签平滑
+  nbs: 64                  # 标称批次大小 
