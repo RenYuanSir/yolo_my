@@ -1,0 +1,1 @@
+python train.py --model ... --loss "TomatoDetectWithRankLoss(lambda_pos=0.2, lambda_rank=0.3, lambda_conf=0.5)"
