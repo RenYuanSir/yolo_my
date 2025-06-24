@@ -9,7 +9,7 @@ import torch
 from PIL import Image
 from torch.utils.data import dataloader, distributed
 
-from ultralytics.data.dataset import GroundingDataset, YOLODataset, YOLOMultiModalDataset
+from ultralytics.data.dataset import GroundingDataset, YOLODataset, YOLOMultiModalDataset, TomatoYOLODataset
 from ultralytics.data.loaders import (
     LOADERS,
     LoadImagesAndVideos,
@@ -160,8 +160,18 @@ def build_yolo_dataset(args, img_path, batch, data, mode="train", rect=False, st
             "fraction": getattr(args, "fraction", 1.0) if mode == "train" else 1.0,
         }
         
-        # 根据数据集特性选择合适的数据集类
-        if data.get("multi_modal", False):
+        # 根据数据集特性和任务选择合适的数据集类
+        task = getattr(args, "task", "detect")
+        if task == "tomato":
+            # 使用番茄检测专用数据集
+            from ultralytics.data.dataset import TomatoYOLODataset
+            LOGGER.info("使用TomatoYOLODataset加载番茄检测数据集")
+            # 确保数据集包含番茄特定标志
+            data["has_cluster_id"] = True
+            data["has_h_rel"] = True
+            dataset_args["data"] = data  # 更新数据字典
+            dataset = TomatoYOLODataset(**dataset_args)
+        elif data.get("multi_modal", False):
             from ultralytics.data.dataset import YOLOMultiModalDataset
             dataset = YOLOMultiModalDataset(**dataset_args)
         else:

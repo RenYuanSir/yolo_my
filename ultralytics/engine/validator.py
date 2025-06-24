@@ -141,10 +141,14 @@ class BaseValidator:
                 self.args.batch = model.metadata.get("batch", 1)  # export.py models default to batch-size 1
                 LOGGER.info(f"Setting batch={self.args.batch} input of shape ({self.args.batch}, 3, {imgsz}, {imgsz})")
 
+            # 加载数据集
             if str(self.args.data).split(".")[-1] in {"yaml", "yml"}:
                 self.data = check_det_dataset(self.args.data)
             elif self.args.task == "classify":
                 self.data = check_cls_dataset(self.args.data, split=self.args.split)
+            elif self.args.task == "tomato":  # 增加对tomato任务的支持
+                self.data = check_det_dataset(self.args.data)  # 使用检测数据集检查器
+                LOGGER.info(f"Validating tomato detection model on {self.args.data}")
             else:
                 raise FileNotFoundError(emojis(f"Dataset '{self.args.data}' for task={self.args.task} not found ❌"))
 

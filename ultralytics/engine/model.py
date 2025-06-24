@@ -610,83 +610,85 @@ class Model(nn.Module):
         **kwargs: Any,
     ):
         """
-        Validates the model using a specified dataset and validation configuration.
-
-        This method facilitates the model validation process, allowing for customization through various settings. It
-        supports validation with a custom validator or the default validation approach. The method combines default
-        configurations, method-specific defaults, and user-provided arguments to configure the validation process.
+        Validate the model on a given dataset.
 
         Args:
-            validator (ultralytics.engine.validator.BaseValidator | None): An instance of a custom validator class for
-                validating the model.
-            **kwargs: Arbitrary keyword arguments for customizing the validation process.
+            validator (BaseValidator, optional): Customized validator object. If provided, the configured validator will
+                be used for validation instead of creating a new one.
+            **kwargs (Any): Additional keyword arguments to override validation configurations.
+                For a complete list, see the YOLO/base/default.yaml configuration file.
 
         Returns:
-            (ultralytics.utils.metrics.DetMetrics): Validation metrics obtained from the validation process.
-
-        Raises:
-            AssertionError: If the model is not a PyTorch model.
+            (Dict): Validation metrics and results.
 
         Examples:
-            >>> model = YOLO("yolo11n.pt")
+            >>> model = YOLO("yolov8n.pt")
             >>> results = model.val(data="coco8.yaml", imgsz=640)
-            >>> print(results.box.map)  # Print mAP50-95
+            Ultralytics YOLOv8.0.28 🚀 Python-3.10.x torch-2.0.0+cpu CPU
+            Model summary: 168 layers, 3151904 parameters, 0 gradients
+            Validate...
+            [2023-10-1 13:12:07] val: data=/home/username/ultralytics/yolo/assets/coco8.yaml, imgsz=640, batch=1, device=cpu, half=False, dnn=False, plots=False
+            Class     Images  Instances          P          R      mAP50   mAP50-95
+            all           8         15      0.746      0.602      0.664      0.442
         """
-        custom = {"rect": True}  # method defaults
-        args = {**self.overrides, **custom, **kwargs, "mode": "val"}  # highest priority args on the right
-
-        validator = (validator or self._smart_load("validator"))(args=args, _callbacks=self.callbacks)
-        validator(model=self.model)
-        self.metrics = validator.metrics
-        return validator.metrics
-
+        self._check_is_pytorch_model()
+        args = {**self.overrides, **kwargs}  # prefer kwargs
+        args["mode"] = "val"
+        args["save"] = args.get("save", False)  # disable auto-saves
+        args["task"] = self.task
+        
+        # 确保data参数有效
+        if not args.get("data"):
+            args["data"] = TASK2DATA.get(self.task)
+            if args["data"] is None:
+                raise KeyError(
+                    f"ERROR ❌ No dataset YAML defined for task={self.task}. Please specify a --data argument, "
+                    f"i.e. 'yolo val model=yolo11n-{self.task}.pt data=path/to/data.yaml'"
+                )
+        
+        self.validator = (validator or self._smart_load("validator"))(args=args, _callbacks=self.callbacks)
+        self.validator.model = self.model
+        self.metrics = self.validator()
+        return self.metrics
+        
     def benchmark(
         self,
         **kwargs: Any,
     ):
         """
-        Benchmarks the model across various export formats to evaluate performance.
-
-        This method assesses the model's performance in different export formats, such as ONNX, TorchScript, etc.
-        It uses the 'benchmark' function from the ultralytics.utils.benchmarks module. The benchmarking is
-        configured using a combination of default configuration values, model-specific arguments, method-specific
-        defaults, and any additional user-provided keyword arguments.
+        Benchmark the model speed and performance.
 
         Args:
-            **kwargs: Arbitrary keyword arguments to customize the benchmarking process. These are combined with
-                default configurations, model-specific arguments, and method defaults. Common options include:
-                - data (str): Path to the dataset for benchmarking.
-                - imgsz (int | List[int]): Image size for benchmarking.
-                - half (bool): Whether to use half-precision (FP16) mode.
-                - int8 (bool): Whether to use int8 precision mode.
-                - device (str): Device to run the benchmark on (e.g., 'cpu', 'cuda').
-                - verbose (bool): Whether to print detailed benchmark information.
+            **kwargs (Any): Keyword arguments passed to the benchmarking function.
 
         Returns:
-            (Dict): A dictionary containing the results of the benchmarking process, including metrics for
-                different export formats.
-
-        Raises:
-            AssertionError: If the model is not a PyTorch model.
+            (Dict): Results of benchmark.
 
         Examples:
-            >>> model = YOLO("yolo11n.pt")
-            >>> results = model.benchmark(data="coco8.yaml", imgsz=640, half=True)
-            >>> print(results)
+            >>> model = YOLO("yolov8n.pt")
+            >>> results = model.benchmark(data="coco8.yaml", imgsz=640)
         """
         self._check_is_pytorch_model()
         from ultralytics.utils.benchmarks import benchmark
 
-        custom = {"verbose": False}  # method defaults
-        args = {**DEFAULT_CFG_DICT, **self.model.args, **custom, **kwargs, "mode": "benchmark"}
+        # 确保data参数有效
+        if not kwargs.get("data"):
+            kwargs["data"] = TASK2DATA.get(self.task)
+            if kwargs["data"] is None:
+                raise KeyError(
+                    f"ERROR ❌ No dataset YAML defined for task={self.task}. Please specify a --data argument, "
+                    f"i.e. 'yolo benchmark model=yolo11n-{self.task}.pt data=path/to/data.yaml'"
+                )
+
         return benchmark(
-            model=self,
-            data=kwargs.get("data"),  # if no 'data' argument passed set data=None for default datasets
-            imgsz=args["imgsz"],
-            half=args["half"],
-            int8=args["int8"],
-            device=args["device"],
-            verbose=kwargs.get("verbose"),
+            model=copy(self.model),
+            data=kwargs.get("data"),
+            imgsz=kwargs.get("imgsz", DEFAULT_CFG.imgsz),
+            half=kwargs.get("half", False),
+            int8=kwargs.get("int8", False),
+            device=kwargs.get("device", ""),
+            verbose=kwargs.get("verbose", False),
+            profile=kwargs.get("profile", False),
         )
 
     def export(
@@ -743,40 +745,29 @@ class Model(nn.Module):
         **kwargs: Any,
     ):
         """
-        Trains the model using the specified dataset and training configuration.
-
-        This method facilitates model training with a range of customizable settings. It supports training with a
-        custom trainer or the default training approach. The method handles scenarios such as resuming training
-        from a checkpoint, integrating with Ultralytics HUB, and updating model and configuration after training.
-
-        When using Ultralytics HUB, if the session has a loaded model, the method prioritizes HUB training
-        arguments and warns if local arguments are provided. It checks for pip updates and combines default
-        configurations, method-specific defaults, and user-provided arguments to configure the training process.
+        Trains the model on a given dataset.
 
         Args:
-            trainer (BaseTrainer | None): Custom trainer instance for model training. If None, uses default.
-            **kwargs: Arbitrary keyword arguments for training configuration. Common options include:
-                data (str): Path to dataset configuration file.
-                epochs (int): Number of training epochs.
-                batch_size (int): Batch size for training.
-                imgsz (int): Input image size.
-                device (str): Device to run training on (e.g., 'cuda', 'cpu').
-                workers (int): Number of worker threads for data loading.
-                optimizer (str): Optimizer to use for training.
-                lr0 (float): Initial learning rate.
-                patience (int): Epochs to wait for no observable improvement for early stopping of training.
+            trainer (BaseTrainer, optional): Customized trainer object. If provided, the configured trainer will be used
+                for training instead of creating a new one.
+            **kwargs (Any): Additional keyword arguments to override model and training configurations.
+                For a complete list, see the YOLO/base/default.yaml configuration file.
 
         Returns:
-            (Dict | None): Training metrics if available and training is successful; otherwise, None.
-
-        Raises:
-            AssertionError: If the model is not a PyTorch model.
-            PermissionError: If there is a permission issue with the HUB session.
-            ModuleNotFoundError: If the HUB SDK is not installed.
+            (dict): Training metrics and results.
 
         Examples:
-            >>> model = YOLO("yolo11n.pt")
-            >>> results = model.train(data="coco8.yaml", epochs=3)
+            >>> model = YOLO("yolov8n.pt")
+            >>> results = model.train(data="coco8.yaml", epochs=100, imgsz=640)
+            Ultralytics YOLOv8.0.28 🚀 Python-3.10.x torch-2.0.0+cpu CPU
+            Model summary: 168 layers, 3151904 parameters, 0 gradients
+            [2023-10-1 13:12:07] Freezing layer 'model.22.dfl.conv.weight'
+            [2023-10-1 13:12:22] ✓ Checkpoint saved to 'runs/detect/train/weights/last.pt'
+            Training results saved to runs/detect/train
+            Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+              1/100     1.63G     0.9702     2.595      1.654         79        640: 100% 1/1 [00:00<00:00, 13.56it/s]
+                     metrics/precision  metrics/recall  metrics/mAP50  metrics/mAP50-95
+                               0.76319        0.59494      0.66425         0.44218
         """
         self._check_is_pytorch_model()
         if hasattr(self.session, "model") and self.session.model.id:  # Ultralytics HUB session with loaded model
@@ -789,10 +780,18 @@ class Model(nn.Module):
         overrides = yaml_load(checks.check_yaml(kwargs["cfg"])) if kwargs.get("cfg") else self.overrides
         custom = {
             # NOTE: handle the case when 'cfg' includes 'data'.
-            "data": overrides.get("data") or DEFAULT_CFG_DICT["data"] or TASK2DATA[self.task],
+            "data": overrides.get("data") or DEFAULT_CFG_DICT["data"] or TASK2DATA.get(self.task),
             "model": self.overrides["model"],
             "task": self.task,
         }  # method defaults
+        
+        # 如果无法获取data路径，给出友好的错误信息
+        if custom["data"] is None:
+            raise KeyError(
+                f"ERROR ❌ No dataset YAML defined for task={self.task}. Please specify a --data argument, "
+                f"i.e. 'yolo train model=yolo11n-{self.task}.pt data=path/to/data.yaml'"
+            )
+            
         args = {**overrides, **custom, **kwargs, "mode": "train"}  # highest priority args on the right
         if args.get("resume"):
             args["resume"] = self.ckpt_path

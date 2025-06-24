@@ -1,18 +1,18 @@
-task: detect
+task: tomato
 mode: train
 model: /root/shared-nvme/yolov12-main/yolov12-new/ultralytics/cfg/models/v12/yolo12s-A2C2f-DYT-EfficientHead-MambaOut.yaml
 data: /root/shared-nvme/tomato_transStyle/data.yaml
-epochs: 5
+epochs: 1
 time: null
 patience: 100
-batch: 16
+batch: 4
 imgsz: 640
 save: true
 save_period: -1
 cache: false
 device:
 - 0
-workers: 8
+workers: 1
 project: runs/train
 name: debug
 exist_ok: false
@@ -92,7 +92,7 @@ degrees: 0.0
 translate: 0.0
 scale: 0.0
 shear: 0.0
-perspective: 0.0005
+perspective: 0.0
 flipud: 0.0
 fliplr: 0.0
 bgr: 0.0

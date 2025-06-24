@@ -158,3 +158,72 @@ The code is based on [ultralytics](https://github.com/ultralytics/ultralytics). 
 }
 ```
 
+# 番茄检测模型修复方案
+
+## 问题分析
+
+我们对番茄检测模型遇到的问题进行了深入分析，发现关键的数据管道故障导致了训练失败。具体来说，问题主要集中在以下几个方面：
+
+1. **数据加载问题**：在数据处理流程中，7列标签格式（含两个辅助属性：h_rel和cluster_ids）在数据增强过程中没有被正确处理和传递。
+
+2. **数据变换问题**：在数据增强操作中，额外的列信息（h_rel和cluster_ids）在流转过程中丢失。
+
+3. **实例化处理**：Instances类没有完全支持这两个辅助字段，导致在变换之后信息丢失。
+
+4. **格式化处理**：Format类负责最终将标签格式化为模型可用的格式，但它没有处理h_rel和cluster_ids字段。
+
+5. **损失函数计算**：TomatoDetectWithRankLoss在计算排序损失时没有足够的健壮性检查，缺少容错机制。
+
+## 修复方案
+
+我们对关键代码模块实施了以下修改：
+
+### 1. dataset.py - TomatoYOLODataset类
+
+- 修改了初始化方法，确保正确设置has_cluster_id和has_h_rel标志
+- 增强了build_transforms方法，确保Format变换知道要保留额外属性
+- 改进了__getitem__方法，确保返回的数据包含所需的所有字段
+- 完善了update_labels_info方法，确保标签处理过程中保留辅助属性
+- 增强了collate_fn方法，处理batch数据的正确拼接
+
+### 2. augment.py - Format类
+
+- 添加了return_tomato_attrs参数，用于控制是否返回番茄特有属性
+- 修改了__call__方法，确保在整个数据处理流程中正确处理cluster_ids和h_rel
+- 添加了更健壮的错误处理，避免因属性缺失导致异常
+
+### 3. instance.py - Instances类
+
+- 扩展了Instances类，使其能够存储和处理cluster_ids和h_rel属性
+- 修改了各种变换方法（scale, normalize, denormalize等），确保在操作过程中保留这些属性
+- 增强了update方法，支持更新这些新添加的属性
+
+### 4. loss.py - TomatoDetectWithRankLoss类
+
+- 增强了错误处理和日志记录，使得问题更容易诊断
+- 添加了更详细的数据完整性检查，防止在缺少必要数据时崩溃
+- 优化了排序损失计算逻辑，增加了对无效数据的过滤
+- 减少了不必要的调试日志，只在debug模式下输出详细信息
+
+## 实现细节
+
+1. **数据流正确性**：确保从数据加载、预处理、增强直到传入模型的整个流程中，7列标签格式的完整性被保持。
+
+2. **健壮性增强**：添加了必要的错误检查和容错机制，确保即使数据不完整，模型依然能够进行训练。
+
+3. **保持兼容性**：所有修改都与原有的YOLOv12框架保持兼容，不影响其他模型的使用。
+
+## 使用方法
+
+修复后的代码能够正确处理7列标签格式，支持番茄串检测和排序损失计算。只需确保标签文件使用正确的格式：
+
+```
+class_id x_center y_center width height cluster_id h_rel
+```
+
+其中：
+- class_id：类别ID
+- x_center, y_center, width, height：归一化的边界框坐标
+- cluster_id：番茄串ID
+- h_rel：相对高度（0-1之间，0表示最高位置）
+

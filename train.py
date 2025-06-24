@@ -28,7 +28,7 @@ if __name__ == '__main__':
                 translate=0.0, # 关闭平移
                 scale=0.0, # 关闭缩放
                 shear=0.0, # 关闭剪切
-                perspective=0.0005, # 关闭透视变换
+                perspective=0.0, # 关闭透视变换
                 flipud=0.0, # 关闭上下翻转
                 fliplr=0.0, # 关闭左右翻转
                 mosaic=0.0, # 关闭拼接

@@ -680,10 +680,10 @@ class Detect_Efficient_Tomato(Detect_Efficient):
     """YOLOv8 Detect Efficient head with h_rel for tomato fruit detection."""
     def __init__(self, nc=80, ch=()):  # detection layer
         super().__init__(nc, ch)
-        # 修改输出通道数，增加1个通道用于h_rel
-        self.no = nc + self.reg_max * 4 + 1  # +1 for h_rel
-        # 添加h_rel的预测头
-        self.cv4 = nn.ModuleList(nn.Conv2d(x, 1, 1) for x in ch)  # 1×1 conv for h_rel
+        # 不再修改self.no，保持与父类一致的通道数
+        # self.no = nc + self.reg_max * 4 + 1  # 删除这行，不再+1
+        # 添加h_rel的预测头作为独立分支
+        self.cv_h_pos = nn.ModuleList(nn.Conv2d(x, 1, 1) for x in ch)  # 1×1 conv for h_rel
 
     def forward(self, x):
         """Concatenates and returns predicted bounding boxes and class probabilities and h_rel."""
@@ -692,12 +692,12 @@ class Detect_Efficient_Tomato(Detect_Efficient):
         bbox_cls_features = []  # 存储每层的bbox+cls预测
         
         for i in range(self.nl):
-            x[i] = self.stem[i](x[i])
-            # 获取h_pos预测，但不与其他特征拼接
-            h_pos = self.cv4[i](x[i])
+            x_stem = self.stem[i](x[i])
+            # 获取h_pos预测，使用独立的分支
+            h_pos = self.cv_h_pos[i](x_stem)
             h_pos_features.append(h_pos)
             # 只拼接bbox和class预测
-            bbox_cls = torch.cat((self.cv2[i](x[i]), self.cv3[i](x[i])), 1)
+            bbox_cls = torch.cat((self.cv2[i](x_stem), self.cv3[i](x_stem)), 1)
             bbox_cls_features.append(bbox_cls)
         
         if self.training:
@@ -710,7 +710,7 @@ class Detect_Efficient_Tomato(Detect_Efficient):
             self.shape = shape
 
         # 处理bbox和类别预测
-        x_cat = torch.cat([xi.view(shape[0], self.no - 1, -1) for xi in bbox_cls_features], 2)  # no-1 因为h_pos单独处理
+        x_cat = torch.cat([xi.view(shape[0], self.no, -1) for xi in bbox_cls_features], 2)
         h_pos_cat = torch.cat([xi.view(shape[0], 1, -1) for xi in h_pos_features], 2)
         
         if self.export and self.format in ('saved_model', 'pb', 'tflite', 'edgetpu', 'tfjs'):
@@ -732,7 +732,7 @@ class Detect_Efficient_Tomato(Detect_Efficient):
     def bias_init(self):
         """Initialize biases for detection, classification and h_rel prediction."""
         m = self
-        for a, b, c, s in zip(m.cv2, m.cv3, m.cv4, m.stride):
+        for a, b, c, s in zip(m.cv2, m.cv3, m.cv_h_pos, m.stride):
             # 边界框预测初始化 - DFL权重
             a.bias.data[:] = 1.0  # box - 使用更大的正值确保初始边界框大小合适
             

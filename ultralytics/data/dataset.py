@@ -287,110 +287,84 @@ class YOLODataset(BaseDataset):
         hyp.mixup = 0.0  # keep the same behavior as previous v8 close-mosaic
         self.transforms = self.build_transforms(hyp)
 
+    def __getitem__(self, index):
+        """
+        Returns a single sample with augmentations.
+        This simplified version correctly packages data for the transform pipeline.
+        """
+        # This will now correctly pass a dictionary with Instances object to transforms
+        label = self.get_image_and_label(index)
+        
+        # Apply transforms
+        return self.transforms(label) if self.augment else label
+
+
     def update_labels_info(self, label):
         """
-        Custom your label format here.
-
-        Note:
-            cls is not with bboxes now, classification and semantic segmentation need an independent cls label
-            Can also support classification and semantic segmentation by adding or removing dict keys there.
+        Packages label data into a dictionary with an Instances object.
+        This is the crucial step to ensure data survives augmentations.
         """
         bboxes = label.pop("bboxes")
+        cls = label.pop("cls")
         segments = label.pop("segments", [])
         keypoints = label.pop("keypoints", None)
-        bbox_format = label.pop("bbox_format")
-        normalized = label.pop("normalized")
 
-        # 处理额外的番茄数据属性
-        # 安全处理：如果有cluster_id/cluster_ids和h_rel，保留它们
-        # 注意处理两种可能的键名：cluster_id和cluster_ids
-        if "cluster_ids" in label:
-            # cluster_ids已经存在，无需操作
-            pass
-        elif "cluster_id" in label:
-            # 将cluster_id复制为cluster_ids
-            label["cluster_ids"] = label["cluster_id"]
-            # 可选：删除旧键名，统一使用新键名
-            # label.pop("cluster_id")
+        # --- Safely pop custom attributes ---
+        cluster_ids = label.pop("cluster_ids", None)
+        h_rel = label.pop("h_rel", None)
+
+        # Create the Instances object, passing custom attributes to its constructor
+        instances = Instances(bboxes, segments, keypoints, bbox_format="xywh", normalized=True,
+                              cluster_ids=cluster_ids, h_rel=h_rel)
         
-        # h_rel不需要改名，保持原样
-        
-        # NOTE: do NOT resample oriented boxes
-        segment_resamples = 100 if self.use_obb else 1000
-        if len(segments) > 0:
-            # make sure segments interpolate correctly if original length is greater than segment_resamples
-            max_len = max(len(s) for s in segments)
-            segment_resamples = (max_len + 1) if segment_resamples < max_len else segment_resamples
-            # list[np.array(segment_resamples, 2)] * num_samples
-            segments = np.stack(resample_segments(segments, n=segment_resamples), axis=0)
-        else:
-            segments = np.zeros((0, segment_resamples, 2), dtype=np.float32)
-        label["instances"] = Instances(bboxes, segments, keypoints, bbox_format=bbox_format, normalized=normalized)
+        label["instances"] = instances
+        label["cls"] = cls
         return label
 
 
     @staticmethod
     def collate_fn(batch):
-        imgs, cls_l, box_l, bid_l = [], [], [], []
-        cid_l, hrel_l = [], []
-        im_files = []  # 添加图像文件路径列表
-    
-        for i, samp in enumerate(batch):
-            # 图像
-            imgs.append(samp['img'])  # (C,H,W)
-            
-            # 保存图像文件路径，用于可视化
-            if 'im_file' in samp:
-                im_files.append(samp['im_file'])
+        """
+        A standard and simple collate function.
+        It expects the 'Format' transform to have created a 'labels' tensor.
+        """
+        new_batch = {}
+        # Get keys from the first sample
+        keys = batch[0].keys()
+        for key in keys:
+            if key == 'labels':
+                # For labels, concatenate them along the first dimension
+                new_batch[key] = torch.cat([b[key] for b in batch if b[key] is not None and len(b[key]) > 0], 0)
+            elif key == 'img':
+                # For images, stack them to create a batch dimension
+                new_batch[key] = torch.stack([b['img'] for b in batch], 0)
             else:
-                # 如果没有im_file，使用空字符串
-                im_files.append("")
-    
-            # 主标签
-            cls = torch.as_tensor(samp['cls'], dtype=torch.float32)
-            boxes = torch.as_tensor(samp['bboxes'], dtype=torch.float32)
-            n = boxes.shape[0]
-            idx = torch.full((n,), i, dtype=torch.float32)  # 一维 batch 索引
-    
-            cls_l.append(cls)
-            box_l.append(boxes)
-            bid_l.append(idx)
-    
-            # 额外列保持行数一致 - 优先尝试使用'cluster_ids'，回退到'cluster_id'
-            # 注意：update_labels_info方法中使用了cluster_ids键名
-            cid = torch.as_tensor(
-                samp.get('cluster_ids', 
-                    samp.get('cluster_id', np.zeros((n, 1)))
-                ), 
-                dtype=torch.float32
-            )
-            hrel = torch.as_tensor(samp.get('h_rel', np.zeros((n, 1))), dtype=torch.float32)
-    
-            # 确保 cluster_id 和 h_rel 的维度与 bboxes 一致
-            if cid.shape[0] != n:
-                print(f"Warning: cluster_ids has inconsistent dimension for sample {i}: {cid.shape[0]} != {n}")
-                cid = torch.zeros((n, 1), dtype=torch.float32)
-            if hrel.shape[0] != n:
-                print(f"Warning: h_rel has inconsistent dimension for sample {i}: {hrel.shape[0]} != {n}")
-                hrel = torch.zeros((n, 1), dtype=torch.float32)
-    
-            cid_l.append(cid)
-            hrel_l.append(hrel)
-    
-        # 拼接成一个batch
-        return {
-            "img": torch.stack(imgs, 0),       # (B,C,H,W)
-            "cls": torch.cat(cls_l, 0),
-            "bboxes": torch.cat(box_l, 0),
-            "batch_idx": torch.cat(bid_l, 0),   # (ΣN,)
-            "cluster_ids": torch.cat(cid_l, 0),   # 统一使用cluster_ids
-            "h_rel": torch.cat(hrel_l, 0),
-            "im_file": im_files,               # 添加图像文件路径，用于可视化
-        }
+                # For other metadata like file paths, just collect them in a list
+                new_batch[key] = [b[key] for b in batch]
+
+        # Ensure 'labels' key exists even if the batch has no labels
+        if 'labels' not in new_batch:
+            new_batch['labels'] = torch.zeros((0, 8)) # [batch_idx, cls, xywh, cluster_id, h_rel]
+            
+        # Add batch_idx to the labels tensor
+        if len(new_batch['labels']) > 0:
+            batch_idx = torch.cat([torch.full((b['labels'].shape[0], 1), i) for i, b in enumerate(batch) if b['labels'] is not None and len(b['labels']) > 0])
+            new_batch['labels'] = torch.cat((batch_idx, new_batch['labels']), 1)
+
+        return new_batch
 
 
-
-
+class TomatoYOLODataset(YOLODataset):
+    """
+    The custom dataset class is now much simpler. It just needs to
+    set the flags and can inherit most of the logic.
+    """
+    def __init__(self, *args, data=None, **kwargs):
+        data = data or {}
+        data["has_cluster_id"] = True
+        data["has_h_rel"] = True
+        super().__init__(*args, data=data, **kwargs)
+        LOGGER.info(f"TomatoYOLODataset initialized with: has_cluster_id={self.has_cluster_id}, has_h_rel={self.has_h_rel}")
 
 
 class YOLOMultiModalDataset(YOLODataset):

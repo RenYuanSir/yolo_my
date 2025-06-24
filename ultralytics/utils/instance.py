@@ -6,6 +6,7 @@ from numbers import Number
 from typing import List
 
 import numpy as np
+import torch
 
 from ultralytics.utils import LOGGER
 from .ops import ltwh2xywh, ltwh2xyxy, resample_segments, xywh2ltwh, xywh2xyxy, xyxy2ltwh, xyxy2xywh
@@ -192,372 +193,417 @@ class Instances:
         keypoints (ndarray): keypoints(x, y, visible) with shape [N, 17, 3]. Default is None.
         normalized (bool): Flag indicating whether the bounding box coordinates are normalized.
         segments (ndarray): Segments array with shape [N, 1000, 2] after resampling.
+        cluster_ids (ndarray): Cluster IDs with shape [N, 1]. Default is None.
+        h_rel (ndarray): Relative heights with shape [N, 1]. Default is None.
 
     Args:
         bboxes (ndarray): An array of bounding boxes with shape [N, 4].
         segments (list | ndarray, optional): A list or array of object segments. Default is None.
-        keypoints (ndarray, optional): An array of keypoints with shape [N, 17, 3]. Default is None.
-        bbox_format (str, optional): The format of bounding boxes ('xywh' or 'xyxy'). Default is 'xywh'.
+        keypoints (ndarray | None): An ndarray with shape [N, 17, 3] or None.
         normalized (bool, optional): Whether the bounding box coordinates are normalized. Default is True.
-
-    Examples:
-        ```python
-        # Create an Instances object
-        instances = Instances(
-            bboxes=np.array([[10, 10, 30, 30], [20, 20, 40, 40]]),
-            segments=[np.array([[5, 5], [10, 10]]), np.array([[15, 15], [20, 20]])],
-            keypoints=np.array([[[5, 5, 1], [10, 10, 1]], [[15, 15, 1], [20, 20, 1]]]),
-        )
-        ```
-
-    Note:
-        The bounding box format is either 'xywh' or 'xyxy', and is determined by the `bbox_format` argument.
-        This class does not perform input validation, and it assumes the inputs are well-formed.
+        bbox_format (str, optional): The format of bounding boxes. Options are 'xyxy', 'xywh', 'ltrb', 'cxcywh'.
+                                    Default is 'xywh'.
+        cluster_ids (ndarray | None): An array of cluster IDs with shape [N, 1] or None.
+        h_rel (ndarray | None): An array of relative heights with shape [N, 1] or None.
     """
 
-    def __init__(self, bboxes, segments=None, keypoints=None, bbox_format="xywh", normalized=True) -> None:
-        """
-        Initialize the object with bounding boxes, segments, and keypoints.
-
-        Args:
-            bboxes (np.ndarray): Bounding boxes, shape [N, 4].
-            segments (list | np.ndarray, optional): Segmentation masks. Defaults to None.
-            keypoints (np.ndarray, optional): Keypoints, shape [N, 17, 3] and format (x, y, visible). Defaults to None.
-            bbox_format (str, optional): Format of bboxes. Defaults to "xywh".
-            normalized (bool, optional): Whether the coordinates are normalized. Defaults to True.
-        """
-        self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
-        self.keypoints = keypoints
+    def __init__(
+        self,
+        bboxes=None,
+        segments=None,
+        keypoints=None,
+        normalized=True, 
+        bbox_format="xywh",
+        cluster_ids=None,
+        h_rel=None,
+    ):
+        """Initialize the Instances object with bounding boxes, segments, and keypoints."""
         self.normalized = normalized
-        self.segments = segments
+        self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
 
-    def convert_bbox(self, format):
-        """Convert bounding box format."""
-        self._bboxes.convert(format=format)
+        # 处理番茄特有属性
+        self.cluster_ids = np.array(cluster_ids) if cluster_ids is not None and len(cluster_ids) > 0 else None
+        self.h_rel = np.array(h_rel) if h_rel is not None and len(h_rel) > 0 else None
+
+        if segments is None:
+            segments = []
+        # segments (list or ndarray) to segments_tensor (N, 1000, 2)
+        # segments中的每个元素可以是不同长度的ndarray
+        self.segments = segments
+        if isinstance(segments, list) and len(segments) > 0:
+            self.segments = np.stack(segments)
+        # segments: [N, 1000, 2]
+        elif isinstance(segments, np.ndarray) and segments.ndim == 3:
+            self.segments = segments
+        else:
+            self.segments = np.zeros((0, 1000, 2), dtype=np.float32)
+
+        if keypoints is not None and len(keypoints):
+            # for reid use(all keypoint serve as one box)
+            self.keypoints = np.array(keypoints, dtype=np.float32)
+        else:
+            self.keypoints = None
 
     @property
     def bbox_areas(self):
-        """Calculate the area of bounding boxes."""
-        return self._bboxes.areas()
+        """Calculate and return the area of each bounding box."""
+        return self._bboxes.areas
 
-    def scale(self, scale_w, scale_h, bbox_only=False):
-        """Similar to denormalize func but without normalized sign."""
-        self._bboxes.mul(scale=(scale_w, scale_h, scale_w, scale_h))
-        if bbox_only:
-            return
-        
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] *= scale_w
-            self.segments[..., 1] *= scale_h
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] *= scale_w
-                    self.segments[i][..., 1] *= scale_h
-        
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] *= scale_w
-                self.keypoints[..., 1] *= scale_h
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] *= scale_w
-                        self.keypoints[i][..., 1] *= scale_h
+    @property
+    def bboxes(self):
+        """Return the current bounding boxes."""
+        return self._bboxes.bboxes
 
-    def denormalize(self, w, h):
-        """Denormalizes boxes, segments, and keypoints from normalized coordinates."""
-        if not self.normalized:
-            return
-        self._bboxes.mul(scale=(w, h, w, h))
-        
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] *= w
-            self.segments[..., 1] *= h
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] *= w
-                    self.segments[i][..., 1] *= h
-        
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] *= w
-                self.keypoints[..., 1] *= h
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] *= w
-                        self.keypoints[i][..., 1] *= h
-            
-        self.normalized = False
-
-    def normalize(self, w, h):
-        """Normalize bounding boxes, segments, and keypoints to image dimensions."""
-        if self.normalized:
-            return
-        self._bboxes.mul(scale=(1 / w, 1 / h, 1 / w, 1 / h))
-        
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] /= w
-            self.segments[..., 1] /= h
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] /= w
-                    self.segments[i][..., 1] /= h
-        
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] /= w
-                self.keypoints[..., 1] /= h
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] /= w
-                        self.keypoints[i][..., 1] /= h
-            
-        self.normalized = True
-
-    def add_padding(self, padw, padh):
-        """Handle rect and mosaic situation."""
-        assert not self.normalized, "you should add padding with absolute coordinates."
-        self._bboxes.add(offset=(padw, padh, padw, padh))
-        
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] += padw
-            self.segments[..., 1] += padh
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] += padw
-                    self.segments[i][..., 1] += padh
-        
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] += padw
-                self.keypoints[..., 1] += padh
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] += padw
-                        self.keypoints[i][..., 1] += padh
-
-    def __getitem__(self, index) -> "Instances":
+    def scale(self, scale_w, scale_h=None, cur_dim=None):
         """
-        Retrieve a specific instance or a set of instances using indexing.
+        Scale the bounding boxes, segments, and keypoints by the provided scaling factors.
 
         Args:
-            index (int, slice, or np.ndarray): The index, slice, or boolean array to select
-                                               the desired instances.
-
+            scale_w (float): Width scaling factor. If scale_h is None, this value will be used for both width and height.
+            scale_h (float | None, optional): Height scaling factor. If None, scale_w will be used for both dimensions.
+            cur_dim (tuple | None, optional): Current width and height dimensions.
+        
         Returns:
-            Instances: A new Instances object containing the selected bounding boxes,
-                       segments, and keypoints if present.
-
-        Note:
-            When using boolean indexing, make sure to provide a boolean array with the same
-            length as the number of instances.
+            (Instances): Scaled Instances object.
         """
-        segments = self.segments[index] if len(self.segments) else self.segments
-        
-        # 处理keypoints - 静默处理，不产生警告
-        keypoints = None
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                try:
-                    keypoints = self.keypoints[index]
-                except (IndexError, TypeError):
-                    keypoints = None
-            elif isinstance(self.keypoints, list) and len(self.keypoints) > 0:
-                try:
-                    if isinstance(index, (int, np.integer)):
-                        keypoints = [self.keypoints[index]] if index < len(self.keypoints) else []
-                    elif isinstance(index, slice):
-                        keypoints = self.keypoints[index]
-                    elif isinstance(index, (list, np.ndarray)):
-                        keypoints = [self.keypoints[i] for i in index if i < len(self.keypoints)]
-                    else:
-                        keypoints = None
-                except Exception as e:
-                    keypoints = None
-            else:
-                keypoints = None
-                
-        bboxes = self.bboxes[index]
-        bbox_format = self._bboxes.format
-        return Instances(
-            bboxes=bboxes,
-            segments=segments,
-            keypoints=keypoints,
-            bbox_format=bbox_format,
-            normalized=self.normalized,
-        )
+        if scale_h is None:
+            scale_h = scale_w
 
-    def flipud(self, h):
-        """Flips the coordinates of bounding boxes, segments, and keypoints vertically."""
-        if self._bboxes.format == "xyxy":
-            y1 = self.bboxes[:, 1].copy()
-            y2 = self.bboxes[:, 3].copy()
-            self.bboxes[:, 1] = h - y2
-            self.bboxes[:, 3] = h - y1
-        else:
-            self.bboxes[:, 1] = h - self.bboxes[:, 1]
-        
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 1] = h - self.segments[..., 1]
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 1] = h - self.segments[i][..., 1]
-        
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 1] = h - self.keypoints[..., 1]
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 1] = h - self.keypoints[i][..., 1]
+        self._bboxes.mul(scale=(scale_w, scale_h, scale_w, scale_h))
 
-    def fliplr(self, w):
-        """Reverses the order of the bounding boxes and segments horizontally."""
-        if self._bboxes.format == "xyxy":
-            x1 = self.bboxes[:, 0].copy()
-            x2 = self.bboxes[:, 2].copy()
-            self.bboxes[:, 0] = w - x2
-            self.bboxes[:, 2] = w - x1
-        else:
-            self.bboxes[:, 0] = w - self.bboxes[:, 0]
+        if len(self.segments):
+            self.segments[..., 0] *= scale_w
+            self.segments[..., 1] *= scale_h
+
+        if self.keypoints is not None and len(self.keypoints):
+            self.keypoints[..., 0] *= scale_w
+            self.keypoints[..., 1] *= scale_h
+        # 相对高度h_rel不受图像尺寸影响，不需要缩放
+        return self
+
+    def denormalize(self, w, h):
+        """
+        Denormalize bounding boxes, segments, and keypoints from normalized coordinates.
+
+        Args:
+            w (int): Image width.
+            h (int): Image height.
         
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] = w - self.segments[..., 0]
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] = w - self.segments[i][..., 0]
+        Returns:
+            (Instances): Denormalized Instances object.
+        """
+        if not self.normalized:
+            return self
+
+        self._bboxes.mul(scale=(w, h, w, h))
+
+        if len(self.segments):
+            self.segments[..., 0] *= w
+            self.segments[..., 1] *= h
+
+        if self.keypoints is not None and len(self.keypoints):
+            self.keypoints[..., 0] *= w
+            self.keypoints[..., 1] *= h
+
+        self.normalized = False
+        # 相对高度h_rel不受图像尺寸影响，不需要缩放
+        return self
+
+    def normalize(self, w, h):
+        """
+        Normalize bounding boxes, segments, and keypoints to [0, 1] based on image dimensions.
+
+        Args:
+            w (int): Image width.
+            h (int): Image height.
         
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] = w - self.keypoints[..., 0]
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] = w - self.keypoints[i][..., 0]
+        Returns:
+            (Instances): Normalized Instances object.
+        """
+        if self.normalized:
+            return self
+
+        self._bboxes.mul(scale=(1 / w, 1 / h, 1 / w, 1 / h))
+
+        if len(self.segments):
+            self.segments[..., 0] /= w
+            self.segments[..., 1] /= h
+
+        if self.keypoints is not None and len(self.keypoints):
+            self.keypoints[..., 0] /= w
+            self.keypoints[..., 1] /= h
+
+        self.normalized = True
+        # 相对高度h_rel不受图像尺寸影响，不需要缩放
+        return self
+
+    def convert_bbox(self, format):
+        """
+        Convert the format of the bounding boxes.
+
+        Args:
+            format (str): The target format for bounding boxes.
+        
+        Returns:
+            (Instances): Instances object with the bounding boxes in the target format.
+        """
+        self._bboxes.convert(format)
+        return self
+
+    def add_padding(self, padw, padh):
+        """
+        Add padding to the bounding boxes, segments, and keypoints.
+
+        Args:
+            padw (int): Width padding.
+            padh (int): Height padding.
+        
+        Returns:
+            (Instances): Instances object with added padding.
+        """
+        self._bboxes.add(offset=(padw, padh, padw, padh))
+
+        if len(self.segments):
+            self.segments[..., 0] += padw
+            self.segments[..., 1] += padh
+
+        if self.keypoints is not None and len(self.keypoints):
+            self.keypoints[..., 0] += padw
+            self.keypoints[..., 1] += padh
+        # 相对高度h_rel不受图像尺寸影响，不需要缩放
+        return self
 
     def clip(self, w, h):
-        """Clips bounding boxes, segments, and keypoints values to stay within image boundaries."""
-        ori_format = self._bboxes.format
-        self.convert_bbox(format="xyxy")
-        self.bboxes[:, [0, 2]] = self.bboxes[:, [0, 2]].clip(0, w)
-        self.bboxes[:, [1, 3]] = self.bboxes[:, [1, 3]].clip(0, h)
-        if ori_format != "xyxy":
-            self.convert_bbox(format=ori_format)
-            
-        # 处理segments
-        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
-            self.segments[..., 0] = self.segments[..., 0].clip(0, w)
-            self.segments[..., 1] = self.segments[..., 1].clip(0, h)
-        elif len(self.segments) > 0:
-            for i, segment in enumerate(self.segments):
-                if isinstance(segment, np.ndarray) and segment.size > 0:
-                    self.segments[i][..., 0] = self.segments[i][..., 0].clip(0, w)
-                    self.segments[i][..., 1] = self.segments[i][..., 1].clip(0, h)
+        """
+        Clip the bounding boxes, segments, and keypoints to image boundaries.
+
+        Args:
+            w (int): Image width.
+            h (int): Image height.
         
-        # 处理keypoints - 静默处理，不产生警告
-        if self.keypoints is not None:
-            if isinstance(self.keypoints, np.ndarray) and self.keypoints.size > 0:
-                self.keypoints[..., 0] = self.keypoints[..., 0].clip(0, w)
-                self.keypoints[..., 1] = self.keypoints[..., 1].clip(0, h)
-            elif isinstance(self.keypoints, list):
-                for i, keypoint in enumerate(self.keypoints):
-                    if isinstance(keypoint, np.ndarray) and keypoint.size > 0:
-                        self.keypoints[i][..., 0] = self.keypoints[i][..., 0].clip(0, w)
-                        self.keypoints[i][..., 1] = self.keypoints[i][..., 1].clip(0, h)
+        Returns:
+            (Instances): Instances object with clipped coordinates.
+        """
+        self._bboxes.convert(format="xyxy")
+        self._bboxes.bboxes[:, [0, 2]] = self._bboxes.bboxes[:, [0, 2]].clip(0, w)
+        self._bboxes.bboxes[:, [1, 3]] = self._bboxes.bboxes[:, [1, 3]].clip(0, h)
+        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
+            self.segments[:, :, 0] = self.segments[:, :, 0].clip(0, w)
+            self.segments[:, :, 1] = self.segments[:, :, 1].clip(0, h)
+        elif self.segments:  # list of np.ndarray
+            for i in range(len(self.segments)):
+                if self.segments[i].size > 0:
+                    self.segments[i][:, 0] = self.segments[i][:, 0].clip(0, w)
+                    self.segments[i][:, 1] = self.segments[i][:, 1].clip(0, h)
+        if self.keypoints is not None and self.keypoints.size > 0:
+            self.keypoints[:, :, 0] = self.keypoints[:, :, 0].clip(0, w)
+            self.keypoints[:, :, 1] = self.keypoints[:, :, 1].clip(0, h)
+            
+        # cluster_ids和h_rel在裁剪后不变
+        return self
 
-    def remove_zero_area_boxes(self):
-        """Remove zero-area boxes, i.e. after clipping some boxes may have zero width or height."""
-        good = self.bbox_areas > 0
-        if not all(good):
-            self._bboxes = self._bboxes[good]
-            if len(self.segments):
-                self.segments = self.segments[good]
-            if self.keypoints is not None and self.keypoints.shape[0]:
-                self.keypoints = self.keypoints[good]
-        return good
+    def flip(self, fliplr=True, h=0, w=0):
+        """
+        Flip the bounding boxes, segments, and keypoints horizontally or vertically.
 
-    def update(self, bboxes, segments=None, keypoints=None):
-        """Updates instance variables."""
-        self._bboxes = Bboxes(bboxes, format=self._bboxes.format)
+        Args:
+            fliplr (bool, optional): Whether to flip horizontally. Default is True.
+            h (int, optional): Image height. Default is 0.
+            w (int, optional): Image width. Default is 0.
+        
+        Returns:
+            (Instances): Instances object with flipped coordinates.
+        """
+        self._bboxes.bboxes[:, [0, 2]] = self._bboxes.bboxes[:, [2, 0]] if fliplr else self._bboxes.bboxes[:, [0, 2]]
+        self._bboxes.bboxes[:, [1, 3]] = self._bboxes.bboxes[:, [3, 1]] if fliplr else self._bboxes.bboxes[:, [1, 3]]
+        if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
+            self.segments[:, :, 0] = w - self.segments[:, :, 0] if fliplr else self.segments[:, :, 0]
+            self.segments[:, :, 1] = h - self.segments[:, :, 1] if fliplr else self.segments[:, :, 1]
+        elif self.segments:  # list of np.ndarray
+            for i in range(len(self.segments)):
+                if self.segments[i].size > 0:
+                    self.segments[i][:, 0] = w - self.segments[i][:, 0] if fliplr else self.segments[i][:, 0]
+                    self.segments[i][:, 1] = h - self.segments[i][:, 1] if fliplr else self.segments[i][:, 1]
+        if self.keypoints is not None and self.keypoints.size > 0:
+            self.keypoints[:, :, 0] = w - self.keypoints[:, :, 0] if fliplr else self.keypoints[:, :, 0]
+            self.keypoints[:, :, 1] = h - self.keypoints[:, :, 1] if fliplr else self.keypoints[:, :, 1]
+            
+        # 处理h_rel - 因为上下翻转会改变高度顺序，所以需要反转相对高度
+        if self.h_rel is not None and self.h_rel.size > 0:
+            # 保持0.0（串本身）和-1.0（未知）不变，其他值翻转(1.0 - h_rel)
+            valid_mask = (self.h_rel != -1.0) & (self.h_rel != 0.0)
+            self.h_rel[valid_mask] = 1.0 - self.h_rel[valid_mask]
+
+        return self
+
+    def update(self, bboxes=None, segments=None, keypoints=None, cluster_ids=None, h_rel=None):
+        """
+        Update the attributes of the Instances object.
+
+        Args:
+            bboxes (ndarray | None, optional): New bounding boxes. Default is None.
+            segments (list | ndarray | None, optional): New segments. Default is None.
+            keypoints (ndarray | None, optional): New keypoints. Default is None.
+            cluster_ids (ndarray | None, optional): New cluster IDs. Default is None.
+            h_rel (ndarray | None, optional): New relative heights. Default is None.
+        
+        Returns:
+            (Instances): Updated Instances object.
+        """
+        if bboxes is not None:
+            self._bboxes.bboxes = bboxes
+            
         if segments is not None:
-            self.segments = segments
+            if isinstance(segments, list) and len(segments) > 0:
+                self.segments = np.stack(segments)
+            elif isinstance(segments, np.ndarray):
+                self.segments = segments
+            else:
+                self.segments = np.zeros((0, 1000, 2), dtype=np.float32)
+
         if keypoints is not None:
-            self.keypoints = keypoints
+            if len(keypoints):
+                self.keypoints = np.array(keypoints, dtype=np.float32)
+            else:
+                self.keypoints = None
+                
+        # 番茄特有属性更新
+        if cluster_ids is not None:
+            self.cluster_ids = cluster_ids
+            
+        if h_rel is not None:
+            self.h_rel = h_rel
+            
+        return self
 
     def __len__(self):
-        """Return the length of the instance list."""
-        return len(self.bboxes)
+        """Return the number of instances."""
+        return len(self._bboxes)
 
     @classmethod
     def concatenate(cls, instances_list: List["Instances"], axis=0) -> "Instances":
         """
-        Concatenates a list of Instances objects into a single Instances object.
+        Concatenate a list of Instances into one Instances.
 
         Args:
-            instances_list (List[Instances]): A list of Instances objects to concatenate.
-            axis (int, optional): The axis along which the arrays will be concatenated. Defaults to 0.
+            instances_list (List[Instances]): A list of Instances objects.
+            axis (int): The axis along which to concatenate.
 
         Returns:
-            Instances: A new Instances object containing the concatenated bounding boxes,
-                       segments, and keypoints if present.
+            Instances: A new Instances containing all instances from the list.
 
-        Note:
-            The `Instances` objects in the list should have the same properties, such as
-            the format of the bounding boxes, whether keypoints are present, and if the
-            coordinates are normalized.
+        Raises:
+            AssertionError: If the list is empty or doesn't entirely consist of Instances objects.
+
+        Examples:
+            >>> instances1 = Instances(np.array([[0, 0, 10, 10]]), np.array([[[0, 0], [0, 10], [10, 10], [10, 0]]]))
+            >>> instances2 = Instances(np.array([[20, 20, 30, 30]]), np.array([[[20, 20], [20, 30], [30, 30], [30, 20]]]))
+            >>> instances = Instances.concatenate([instances1, instances2])
+            >>> instances.bboxes
+            array([[ 0,  0, 10, 10],
+                   [20, 20, 30, 30]])
+            >>> instances.segments.shape
+            (2, 4, 2)
         """
         assert isinstance(instances_list, (list, tuple))
-        if not instances_list:
+        if len(instances_list) == 0:
             return cls(np.empty(0))
-        assert all(isinstance(instance, Instances) for instance in instances_list)
+        assert all(isinstance(item, Instances) for item in instances_list)
 
         if len(instances_list) == 1:
             return instances_list[0]
 
         use_keypoint = instances_list[0].keypoints is not None
-        bbox_format = instances_list[0]._bboxes.format
-        normalized = instances_list[0].normalized
+        use_segments = instances_list[0].segments is not None
+        
+        # 番茄特有属性
+        use_cluster_ids = instances_list[0].cluster_ids is not None
+        use_h_rel = instances_list[0].h_rel is not None
 
-        cat_boxes = np.concatenate([ins.bboxes for ins in instances_list], axis=axis)
-        seg_len = [b.segments.shape[1] for b in instances_list]
-        if len(set(seg_len)) > 1:  # resample segments if there's different length
-            max_len = max(seg_len)
-            cat_segments = np.concatenate(
-                [
-                    resample_segments(list(b.segments), max_len)
-                    if len(b.segments)
-                    else np.zeros((0, max_len, 2), dtype=np.float32)  # re-generating empty segments
-                    for b in instances_list
-                ],
-                axis=axis,
-            )
+        bboxes = Bboxes.concatenate([inst._bboxes for inst in instances_list], axis=axis)
+        keypoints = (
+            np.concatenate([inst.keypoints for inst in instances_list], axis=axis) if use_keypoint else None
+        )
+        
+        # 处理番茄特有属性
+        cluster_ids = np.concatenate([inst.cluster_ids for inst in instances_list if inst.cluster_ids is not None], axis=axis) \
+            if any(inst.cluster_ids is not None for inst in instances_list) else None
+        h_rel = np.concatenate([inst.h_rel for inst in instances_list if inst.h_rel is not None], axis=axis) \
+            if any(inst.h_rel is not None for inst in instances_list) else None
+
+        if use_segments:
+            segments = []
+            for inst in instances_list:
+                if isinstance(inst.segments, np.ndarray):
+                    segments.append(inst.segments)
+                elif inst.segments:
+                    segments.extend(inst.segments)
+                else:
+                    segments.extend([])
+            if all(isinstance(x, np.ndarray) for x in segments):
+                segments = np.concatenate(segments, axis=axis)
         else:
-            cat_segments = np.concatenate([b.segments for b in instances_list], axis=axis)
-        cat_keypoints = np.concatenate([b.keypoints for b in instances_list], axis=axis) if use_keypoint else None
-        return cls(cat_boxes, cat_segments, cat_keypoints, bbox_format, normalized)
+            segments = None
 
-    @property
-    def bboxes(self):
-        """Return bounding boxes."""
-        return self._bboxes.bboxes
+        return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format, 
+                         normalized=instances_list[0].normalized, cluster_ids=cluster_ids, h_rel=h_rel)
+
+    def __getitem__(self, index) -> "Instances":
+        """
+        Returns a new Instances object containing only the instances specified by index.
+
+        Args:
+            index (int | slice | np.ndarray): Integer or slice index, or a boolean mask of length len(self).
+        
+        Returns:
+            Instances: A new Instances object with the selected instances.
+        """
+        if isinstance(index, int):
+            if index < 0:
+                index = len(self) + index
+            segments = None
+            if self.segments is not None:
+                if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
+                    segments = self.segments[index:index+1]
+                elif isinstance(self.segments, list) and len(self.segments) > 0:
+                    segments = [self.segments[index]]
+            
+            keypoints = None if self.keypoints is None else self.keypoints[index:index+1]
+            
+            # 处理番茄特有属性
+            cluster_ids = None if self.cluster_ids is None else self.cluster_ids[index:index+1]
+            h_rel = None if self.h_rel is None else self.h_rel[index:index+1]
+            
+            return Instances(
+                self._bboxes.bboxes[index:index+1],
+                segments,
+                keypoints,
+                self.normalized,
+                self._bboxes.format,
+                cluster_ids,
+                h_rel,
+            )
+        
+        # 处理切片或布尔索引
+        segments = None
+        if self.segments is not None:
+            if isinstance(self.segments, np.ndarray) and self.segments.size > 0:
+                segments = self.segments[index]
+            elif isinstance(self.segments, list) and len(self.segments) > 0:
+                segments = [self.segments[i] for i in index] if isinstance(index, list) else [self.segments[i] for i in range(len(self.segments)) if index[i]]
+        
+        keypoints = None if self.keypoints is None else self.keypoints[index]
+        
+        # 处理番茄特有属性
+        cluster_ids = self.cluster_ids[index] if self.cluster_ids is not None else None
+        h_rel = self.h_rel[index] if self.h_rel is not None else None
+        
+        return Instances(
+            self._bboxes.bboxes[index],
+            segments,
+            keypoints,
+            self.normalized,
+            self._bboxes.format,
+            cluster_ids,
+            h_rel,
+        )

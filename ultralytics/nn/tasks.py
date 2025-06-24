@@ -10,6 +10,7 @@ from pathlib import Path
 import thop
 import torch
 import torch.nn as nn
+import numpy as np
 
 from ultralytics.nn.modules import (
     AIFI,
@@ -79,6 +80,7 @@ from ultralytics.utils.loss import (
     v8OBBLoss,
     v8PoseLoss,
     v8SegmentationLoss,
+    TomatoDetectWithRankLoss,
 )
 from ultralytics.utils.ops import make_divisible
 from ultralytics.utils.plotting import feature_visualization
@@ -402,6 +404,11 @@ class DetectionModel(BaseModel):
             m.bias_init()  # only run once
         else:
             self.stride = torch.Tensor([32])  # default stride for i.e. RTDETR
+            
+        # 检测是否使用Detect_Efficient_Tomato头部
+        if isinstance(m, Detect_Efficient_Tomato) and not isinstance(self, TomatoDetectionModel):
+            LOGGER.info("检测到番茄检测模型头部，但使用了常规DetectionModel。设置task为'tomato'")
+            self.task = "tomato"
 
         # Init weights, biases
         initialize_weights(self)
@@ -765,6 +772,73 @@ class Ensemble(nn.ModuleList):
         y = torch.cat(y, 2)  # nms ensemble, y shape(B, HW, C)
         return y, None  # inference, train output
 
+class TomatoDetectionModel(DetectionModel):
+    """番茄检测模型，特别优化用于番茄成熟度等级检测和串识别"""
+    
+    def __init__(self, cfg="yolov12-tomato.yaml", ch=3, nc=None, verbose=True):
+        """
+        初始化番茄检测模型
+        
+        Args:
+            cfg (str): 配置文件路径
+            ch (int): 输入通道数
+            nc (int): 类别数量
+            verbose (bool): 是否打印详细信息
+        """
+        super().__init__(cfg=cfg, ch=ch, nc=nc, verbose=verbose)
+        
+        # 检查最后一层是否为Detect_Efficient_Tomato
+        if not isinstance(self.model[-1], Detect_Efficient_Tomato):
+            LOGGER.warning(f"警告：模型最后一层不是Detect_Efficient_Tomato，而是{type(self.model[-1]).__name__}")
+        
+        # 默认排序损失参数
+        self.lambda_rank = 0.2  # 排序损失权重
+        self.margin = 0.1       # 排序边界
+        self.tal_topk = 10      # 任务对齐分配器的topk数量
+    
+    def init_criterion(self):
+        """初始化番茄检测损失函数"""
+        return TomatoDetectWithRankLoss(
+            self,
+            lambda_rank=self.lambda_rank,
+            margin=self.margin,
+            tal_topk=self.tal_topk
+        )
+    
+    def set_rank_params(self, lambda_rank=0.2, margin=0.1, tal_topk=10):
+        """
+        设置排序损失参数
+        
+        Args:
+            lambda_rank (float): 排序损失权重
+            margin (float): 排序边界
+            tal_topk (int): 任务对齐分配器的topk数量
+        """
+        self.lambda_rank = lambda_rank
+        self.margin = margin
+        self.tal_topk = tal_topk
+        
+        # 如果损失函数已初始化，则更新其参数
+        if hasattr(self, 'criterion'):
+            self.criterion.lambda_rank = lambda_rank
+            self.criterion.margin = margin
+    
+    def forward(self, x):
+        """
+        执行前向传播
+        
+        该方法确保与Detect_Efficient_Tomato检测头和TomatoDetectWithRankLoss完美适配
+        保留h_pos预测信息以用于串排序损失计算
+        
+        Args:
+            x: 输入张量或批次数据
+        
+        Returns:
+            预测结果(列表或字典): 包含检测头和h_pos预测的格式化输出
+        """
+        
+        return super().forward(x)
+
 
 # Functions ------------------------------------------------------------------------------------------------------------
 
@@ -937,7 +1011,27 @@ def attempt_load_weights(weights, device=None, inplace=True, fuse=False):
     for w in weights if isinstance(weights, list) else [weights]:
         ckpt, w = torch_safe_load(w)  # load ckpt
         args = {**DEFAULT_CFG_DICT, **ckpt["train_args"]} if "train_args" in ckpt else None  # combined args
-        model = (ckpt.get("ema") or ckpt["model"]).to(device).float()  # FP32 model
+        
+        # 确定模型类型并创建适当的模型实例
+        if isinstance(ckpt.get("model"), nn.Module):
+            model = ckpt.get("model")
+            # 判断模型任务类型并确保使用正确的模型类
+            task = guess_model_task(model)
+            if task == "tomato" and not isinstance(model, TomatoDetectionModel):
+                # 如果是番茄检测任务但不是TomatoDetectionModel类，则重新创建
+                try:
+                    cfg = model.yaml if hasattr(model, "yaml") else "yolov12-tomato.yaml"
+                    new_model = create_model_from_task(task, cfg, nc=model.nc if hasattr(model, "nc") else None, verbose=False)
+                    # 复制权重
+                    new_model.load_state_dict(model.state_dict(), strict=False)
+                    model = new_model
+                except Exception as e:
+                    LOGGER.warning(f"转换模型类型失败: {e}")
+        else:
+            # 从ckpt字典创建模型
+            model = (ckpt.get("ema") or ckpt["model"])
+            
+        model = model.to(device).float()  # FP32 model
 
         # Model compatibility updates
         model.args = args  # attach args to model
@@ -981,6 +1075,29 @@ def attempt_load_one_weight(weight, device=None, inplace=True, fuse=False):
     model.task = guess_model_task(model)
     if not hasattr(model, "stride"):
         model.stride = torch.tensor([32.0])
+        
+    # 检查是否是番茄检测模型
+    if model.task == "tomato" and not isinstance(model, TomatoDetectionModel):
+        LOGGER.info("将模型转换为TomatoDetectionModel")
+        # 保存原始参数
+        orig_params = {name: param.clone() for name, param in model.named_parameters()}
+        # 创建新的番茄检测模型
+        cfg = model.yaml if hasattr(model, "yaml") else "yolov12-tomato.yaml"
+        new_model = TomatoDetectionModel(
+            cfg=cfg,
+            ch=3,
+            nc=model.nc if hasattr(model, "nc") else None,
+            verbose=False
+        ).to(device)
+        # 尝试加载参数
+        try:
+            # 加载相同名称的参数
+            for name, param in new_model.named_parameters():
+                if name in orig_params:
+                    param.data.copy_(orig_params[name])
+            model = new_model
+        except Exception as e:
+            LOGGER.warning(f"转换为TomatoDetectionModel失败: {e}, 使用原始模型")
 
     model = model.fuse().eval() if fuse and hasattr(model, "fuse") else model.eval()  # model in eval mode
 
@@ -1179,6 +1296,13 @@ def yaml_model_load(path):
     d = yaml_load(yaml_file)  # model dict
     d["scale"] = guess_model_scale(path)
     d["yaml_file"] = str(path)
+    
+    # 检查是否是番茄检测模型配置
+    if any("tomato" in str(path).lower() for name in ["stem", "name", "parts"]):
+        d["task"] = "tomato"
+    elif any("detect_efficient_tomato" in str(module).lower() for module in d.get("head", [])):
+        d["task"] = "tomato"
+    
     return d
 
 
@@ -1208,7 +1332,7 @@ def guess_model_task(model):
         model (nn.Module | dict): PyTorch model or model configuration in YAML format.
 
     Returns:
-        (str): Task of the model ('detect', 'segment', 'classify', 'pose').
+        (str): Task of the model ('detect', 'segment', 'classify', 'pose', 'obb', 'tomato').
 
     Raises:
         SyntaxError: If the task of the model could not be determined.
@@ -1220,55 +1344,115 @@ def guess_model_task(model):
         if m in {"classify", "classifier", "cls", "fc"}:
             return "classify"
         if "detect" in m:
+            if "tomato" in m.lower() or "detect_efficient_tomato" in m.lower():
+                return "tomato"
             return "detect"
         if m == "segment":
             return "segment"
-        if m == "pose":
-            return "pose"
-        if m == "obb":
+        if "obb" in m.lower():
             return "obb"
+        if "pose" in m.lower() or "keypoint" in m.lower():
+            return "pose"
+        if "world" in m.lower():
+            return "world"
 
-    # Guess from model cfg
-    if isinstance(model, dict):
-        with contextlib.suppress(Exception):
-            return cfg2task(model)
-    # Guess from PyTorch model
-    if isinstance(model, nn.Module):  # PyTorch model
-        for x in "model.args", "model.model.args", "model.model.model.args":
-            with contextlib.suppress(Exception):
-                return eval(x)["task"]
-        for x in "model.yaml", "model.model.yaml", "model.model.model.yaml":
-            with contextlib.suppress(Exception):
-                return cfg2task(eval(x))
-        for m in model.modules():
-            if isinstance(m, Segment):
-                return "segment"
-            elif isinstance(m, Classify):
-                return "classify"
-            elif isinstance(m, Pose):
-                return "pose"
-            elif isinstance(m, OBB):
-                return "obb"
-            elif isinstance(m, (Detect, WorldDetect, v10Detect)):
+    # 检查配置文件名是否包含任务提示
+    if isinstance(model, dict):  # YAML config file
+        if "yaml_file" in model:
+            yaml_file = model["yaml_file"]
+            if isinstance(yaml_file, str):
+                if "tomato" in yaml_file.lower():
+                    return "tomato"
+        return cfg2task(model)
+
+    # 检查配置属性
+    elif isinstance(model, (str, Path)):  # YAML file path
+        model_path = Path(model)
+        if "tomato" in model_path.stem.lower():  # 优先检查文件名中是否包含tomato
+            return "tomato"
+        
+        # YAML files
+        if model_path.suffix in (".yaml", ".yml"):
+            return cfg2task(yaml_model_load(model_path))
+        
+        # PT files
+        if model_path.suffix == ".pt":
+            return attempt_load_weights(model_path).task
+            
+    # 通过模型属性和结构确定任务类型
+    elif hasattr(model, "task"):  # has task attr
+        return model.task
+    elif hasattr(model, "yaml") and "task" in model.yaml:  # has task attr in YAML
+        return model.yaml["task"]
+    elif isinstance(model, nn.Module):  # has module type
+        for x in "model.model.0", "model.0", "":
+            m = x + ".detect_efficient_tomato" if x else "detect_efficient_tomato"
+            if hasattr_recursive(model, m):
+                return "tomato"
+                
+            m = x + ".detect_efficient" if x else "detect_efficient"
+            if hasattr_recursive(model, m):
                 return "detect"
+                
+            m = x + ".model.22.dfl.conv" if x else "model.22.dfl.conv"
+            if hasattr_recursive(model, m):
+                return "detect"
+                
+            m = x + ".model.22.cv3.conv" if x else "model.22.cv3.conv"  # YOLOv8 Classify()
+            if hasattr_recursive(model, m) and not hasattr_recursive(model, x + ".model.22.dfl.conv"):
+                return "classify"
+                
+            m = x + ".model.23.cv3.conv" if x else "model.23.cv3.conv"  # YOLOv8 Segment()
+            if hasattr_recursive(model, m):
+                return "segment"
+                
+            m = x + ".model.24.cv3.conv" if x else "model.24.cv3.conv"  # YOLOv8 Pose()
+            if hasattr_recursive(model, m):
+                return "pose"
+                
+            m = x + ".model.22.rbr_dense" if x else "model.22.rbr_dense"  # YOLOv8 OBB()
+            if hasattr_recursive(model, m):
+                return "obb"
+                
+            m = x + ".model.22.cv2.0.cv1.conv" if x else "model.22.cv2.0.cv1.conv"  # YOLO World
+            if hasattr_recursive(model, m):
+                return "world"
 
-    # Guess from model filename
-    if isinstance(model, (str, Path)):
-        model = Path(model)
-        if "-seg" in model.stem or "segment" in model.parts:
-            return "segment"
-        elif "-cls" in model.stem or "classify" in model.parts:
-            return "classify"
-        elif "-pose" in model.stem or "pose" in model.parts:
-            return "pose"
-        elif "-obb" in model.stem or "obb" in model.parts:
-            return "obb"
-        elif "detect" in model.parts:
-            return "detect"
-
-    # Unable to determine task from model
+    # 如果无法确定，发出错误提示
     LOGGER.warning(
-        "WARNING ⚠️ Unable to automatically guess model task, assuming 'task=detect'. "
-        "Explicitly define task for your model, i.e. 'task=detect', 'segment', 'classify','pose' or 'obb'."
+        f"WARNING ⚠️ Unable to automatically determine model task. Explicitly define task for your model, "
+        f"i.e. 'task=detect', 'segment', 'classify', 'pose', 'obb', 'tomato' or 'world'."
     )
-    return "detect"  # assume detect
+    return None
+
+
+def create_model_from_task(task, cfg, ch=3, nc=None, verbose=True):
+    """
+    根据任务类型和配置创建相应的模型类
+    
+    Args:
+        task (str): 任务类型，如'detect', 'segment', 'classify', 'pose', 'obb', 'tomato'
+        cfg (str): 配置文件路径或配置字典
+        ch (int): 输入通道数
+        nc (int): 类别数量
+        verbose (bool): 是否打印详细信息
+    
+    Returns:
+        nn.Module: 创建的模型
+    """
+    if task == "detect":
+        return DetectionModel(cfg, ch, nc, verbose)
+    elif task == "segment":
+        return SegmentationModel(cfg, ch, nc, verbose)
+    elif task == "classify":
+        return ClassificationModel(cfg, ch, nc, verbose)
+    elif task == "pose":
+        # 假设没有特殊的形状信息
+        return PoseModel(cfg, ch, nc, (None, None), verbose)
+    elif task == "obb":
+        return OBBModel(cfg, ch, nc, verbose)
+    elif task == "tomato":
+        return TomatoDetectionModel(cfg, ch, nc, verbose)
+    else:
+        LOGGER.warning(f"未识别的任务类型 '{task}'，默认使用检测模型")
+        return DetectionModel(cfg, ch, nc, verbose)

@@ -841,20 +841,14 @@ class Mosaic(BaseMixTransform):
         """
         if len(mosaic_labels) == 0:
             return {}
-
-        cls, instances = [], []
-        cluster_ids, h_rel = [], []         # NEW
-        imgsz = self.imgsz * 2
-    
-        for lb in mosaic_labels:
-            cls.append(lb["cls"])
-            instances.append(lb["instances"])
-            if "cluster_ids" in lb:         # NEW
-                cluster_ids.append(lb["cluster_ids"])
-            if "h_rel" in lb:               # NEW
-                h_rel.append(lb["h_rel"])
-    
-        final = {
+        cls = []
+        instances = []
+        imgsz = self.imgsz * 2  # mosaic imgsz
+        for labels in mosaic_labels:
+            cls.append(labels["cls"])
+            instances.append(labels["instances"])
+        # Final labels
+        final_labels = {
             "im_file": mosaic_labels[0]["im_file"],
             "ori_shape": mosaic_labels[0]["ori_shape"],
             "resized_shape": (imgsz, imgsz),
@@ -862,22 +856,12 @@ class Mosaic(BaseMixTransform):
             "instances": Instances.concatenate(instances, axis=0),
             "mosaic_border": self.border,
         }
-        if cluster_ids:
-            final["cluster_ids"] = np.concatenate(cluster_ids, 0)   # NEW
-        if h_rel:
-            final["h_rel"] = np.concatenate(h_rel, 0)               # NEW
-    
-        final["instances"].clip(imgsz, imgsz)
-        good = final["instances"].remove_zero_area_boxes()
-        # 同步掩码
-        final["cls"] = final["cls"][good]
-        if "cluster_ids" in final:
-            final["cluster_ids"] = final["cluster_ids"][good]
-        if "h_rel" in final:
-            final["h_rel"] = final["h_rel"][good]
+        final_labels["instances"].clip(imgsz, imgsz)
+        good = final_labels["instances"].remove_zero_area_boxes()
+        final_labels["cls"] = final_labels["cls"][good]
         if "texts" in mosaic_labels[0]:
-            final["texts"] = mosaic_labels[0]["texts"]
-        return final
+            final_labels["texts"] = mosaic_labels[0]["texts"]
+        return final_labels
 
 
 class MixUp(BaseMixTransform):
@@ -957,18 +941,11 @@ class MixUp(BaseMixTransform):
             >>> mixer = MixUp(dataset)
             >>> mixed_labels = mixer._mix_transform(labels)
         """
+        r = np.random.beta(32.0, 32.0)  # mixup ratio, alpha=beta=32.0
+        labels2 = labels["mix_labels"][0]
         labels["img"] = (labels["img"] * r + labels2["img"] * (1 - r)).astype(np.uint8)
-        labels["instances"] = Instances.concatenate(
-                [labels["instances"], labels2["instances"]], axis=0)
+        labels["instances"] = Instances.concatenate([labels["instances"], labels2["instances"]], axis=0)
         labels["cls"] = np.concatenate([labels["cls"], labels2["cls"]], 0)
-        
-        # NEW ↓↓↓
-        if "cluster_ids" in labels and "cluster_ids" in labels2:
-            labels["cluster_ids"] = np.concatenate(
-                [labels["cluster_ids"], labels2["cluster_ids"]], 0)
-        if "h_rel" in labels and "h_rel" in labels2:
-            labels["h_rel"] = np.concatenate(
-                [labels["h_rel"], labels2["h_rel"]], 0)
         return labels
 
 
@@ -1173,56 +1150,29 @@ class RandomPerspective:
 
     def apply_keypoints(self, keypoints, M):
         """
-        Applies a transformation matrix to keypoints.
+        Applies affine transformation to keypoints.
+
+        This method transforms the input keypoints using the provided affine transformation matrix. It handles
+        perspective rescaling if necessary and updates the visibility of keypoints that fall outside the image
+        boundaries after transformation.
 
         Args:
-            keypoints (np.ndarray): [n, 17, 3] in xyn normalized format. Third channel is the visibility.
-            M (np.ndarray): A 3x3 transformation matrix.
+            keypoints (np.ndarray): Array of keypoints with shape (N, 17, 3), where N is the number of instances,
+                17 is the number of keypoints per instance, and 3 represents (x, y, visibility).
+            M (np.ndarray): 3x3 affine transformation matrix.
 
         Returns:
-            (np.ndarray): Transformed keypoints.
-        
+            (np.ndarray): Transformed keypoints array with the same shape as input (N, 17, 3).
+
         Examples:
-            >>> keypoints = np.random.random((5, 17, 3))  # 5 instances, 17 keypoints, (x, y, visible)
+            >>> random_perspective = RandomPerspective()
+            >>> keypoints = np.random.rand(5, 17, 3)  # 5 instances, 17 keypoints each
             >>> M = np.eye(3)  # Identity transformation
             >>> transformed_keypoints = random_perspective.apply_keypoints(keypoints, M)
         """
-        # 安全检查：如果keypoints是None，直接返回
-        if keypoints is None:
-            return None
-            
-        # 检查keypoints的形状和类型 - 静默处理，不产生警告
-        if not isinstance(keypoints, np.ndarray):
-            return keypoints
-            
-        # 处理空数组情况
-        if keypoints.size == 0:
-            return keypoints
-            
-        # 处理形状不是[n, kpt_num, 3]的情况，尝试推断形状 - 静默处理，不产生警告
-        if len(keypoints.shape) < 2:
-            return keypoints
-        elif len(keypoints.shape) == 2:
-            # 假设是[n, 2]或[n, 3]的形状，将其reshape为[n, 1, 2]或[n, 1, 3]
-            n = keypoints.shape[0]
-            dim = keypoints.shape[1]
-            if dim >= 2:
-                keypoints = keypoints.reshape(n, 1, dim)
-            else:
-                # 形状无法处理 - 静默处理，不产生警告
-                return keypoints
-                
-        # 现在keypoints应该是[n, kpt_num, dim]的形状，其中dim>=2
         n, nkpt = keypoints.shape[:2]
         if n == 0:
             return keypoints
-            
-        # 确保我们有可见性通道，如果没有则添加一个全1的通道
-        if keypoints.shape[2] < 3:
-            # 添加可见性通道
-            visibility = np.ones((n, nkpt, 1), dtype=keypoints.dtype)
-            keypoints = np.concatenate([keypoints, visibility], axis=2)
-            
         xy = np.ones((n * nkpt, 3), dtype=keypoints.dtype)
         visible = keypoints[..., 2].reshape(n * nkpt, 1)
         xy[:, :2] = keypoints[..., :2].reshape(n * nkpt, 2)
@@ -1288,18 +1238,24 @@ class RandomPerspective:
 
         segments = instances.segments
         keypoints = instances.keypoints
+        
+        # 获取番茄特有属性
+        cluster_ids = instances.cluster_ids
+        h_rel = instances.h_rel
+        
         # Update bboxes if there are segments.
         if len(segments):
             bboxes, segments = self.apply_segments(segments, M)
 
         if keypoints is not None:
             keypoints = self.apply_keypoints(keypoints, M)
-        new_instances = Instances(bboxes, segments, keypoints, bbox_format="xyxy", normalized=False)
+        new_instances = Instances(bboxes, segments, keypoints, bbox_format="xyxy", normalized=False, 
+                                 cluster_ids=cluster_ids, h_rel=h_rel)
         # Clip
         new_instances.clip(*self.size)
 
         # Filter instances
-        instances.scale(scale_w=scale, scale_h=scale, bbox_only=True)
+        instances.scale(scale_w=scale, scale_h=scale)
         # Make the bboxes have the same scale with new_bboxes
         i = self.box_candidates(
             box1=instances.bboxes.T, box2=new_instances.bboxes.T, area_thr=0.01 if len(segments) else 0.10
@@ -1308,10 +1264,6 @@ class RandomPerspective:
         labels["cls"] = cls[i]
         labels["img"] = img
         labels["resized_shape"] = img.shape[:2]
-        if "cluster_ids" in labels:
-            labels["cluster_ids"] = labels["cluster_ids"][i]
-        if "h_rel" in labels:
-            labels["h_rel"]      = labels["h_rel"][i]
         return labels
 
     @staticmethod
@@ -1900,7 +1852,7 @@ class Albumentations:
             T = [
                 A.Blur(p=0.01),
                 A.MedianBlur(p=0.01),
-                A.ToGray(p=0.00),
+                A.ToGray(p=0.01),
                 A.CLAHE(p=0.01),
                 A.RandomBrightnessContrast(p=0.0),
                 A.RandomGamma(p=0.0),
@@ -2064,17 +2016,13 @@ class Format:
 
     def __call__(self, labels):
         """
-        Formats image annotations for object detection, instance segmentation, and pose estimation tasks.
-
-        This method standardizes the image and instance annotations to be used by the `collate_fn` in PyTorch
-        DataLoader. It processes the input labels dictionary, converting annotations to the specified format and
-        applying normalization if required.
+        Formats images and labels for object detection and segmentation.
 
         Args:
-            labels (Dict): A dictionary containing image and annotation data with the following keys:
-                - 'img': The input image as a numpy array.
-                - 'cls': Class labels for instances.
-                - 'instances': An Instances object containing bounding boxes, segments, and keypoints.
+            labels (dict): Dictionary containing the following keys:
+                - 'img': The image tensor or ndarray.
+                - 'cls': Class labels.
+                - 'instances': Object containing 'bboxes', 'segments', and 'keypoints'.
 
         Returns:
             (Dict): A dictionary with formatted data, including:
@@ -2093,10 +2041,35 @@ class Format:
         """
         img = labels.pop("img")
         h, w = img.shape[:2]
-        cls = labels.pop("cls")
-        instances = labels.pop("instances")
-        instances.convert_bbox(format=self.bbox_format)
-        instances.denormalize(w, h)
+        
+        # 检查instances是否存在，如果不存在则创建一个空的实例
+        if "instances" not in labels:
+            LOGGER.warning("Format.__call__: 缺少instances数据，创建空instances!")
+            # 导入必要的类
+            from ultralytics.utils.instance import Instances
+            
+            # 创建空的instances对象
+            instances = Instances(bboxes=np.zeros((0, 4)), segments=[], keypoints=None)
+            instances.convert_bbox(format=self.bbox_format)
+            
+            # 检查cls是否存在
+            if "cls" in labels:
+                cls = labels.pop("cls")
+            else:
+                cls = np.zeros(0)
+        else:
+            instances = labels.pop("instances")
+            
+            # 检查cls是否存在
+            if "cls" in labels:
+                cls = labels.pop("cls")
+            else:
+                LOGGER.warning("Format.__call__: 缺少cls数据，创建空cls!")
+                cls = np.zeros(0)
+                
+            instances.convert_bbox(format=self.bbox_format)
+            instances.denormalize(w, h)
+            
         nl = len(instances)
 
         if self.return_mask:
@@ -2153,28 +2126,56 @@ class Format:
             >>> print(formatted_img.shape)
             torch.Size([3, 100, 100])
         """
-        if len(img.shape) < 3:
-            img = np.expand_dims(img, -1)
-        img = img.transpose(2, 0, 1)
-        img = np.ascontiguousarray(img[::-1] if random.uniform(0, 1) > self.bgr else img)
-        img = torch.from_numpy(img)
-        return img
+        try:
+            # 处理已经是PyTorch Tensor的情况
+            if isinstance(img, torch.Tensor):
+                # 如果已经是CHW格式，直接返回
+                if img.ndim == 3 and img.shape[0] in [1, 3, 4]:  # 已经是CHW格式
+                    return img
+                # 如果是HWC格式，转换为CHW
+                elif img.ndim == 3 and img.shape[2] in [1, 3, 4]:  # HWC格式
+                    img = img.permute(2, 0, 1)
+                    return img.contiguous()[::-1] if random.uniform(0, 1) > self.bgr else img.contiguous()
+                # 如果是灰度图，添加通道维度
+                elif img.ndim == 2:  # 灰度图
+                    img = img.unsqueeze(0)
+                    return img.contiguous()
+                else:
+                    LOGGER.warning(f"无法处理的图像格式: {img.shape}")
+                    # 创建一个随机图像作为替代
+                    return torch.zeros((3, 640, 640), dtype=torch.float32)
+            # 处理NumPy数组
+            elif isinstance(img, np.ndarray):
+                if len(img.shape) < 3:
+                    img = np.expand_dims(img, -1)
+                img = np.transpose(img, (2, 0, 1))  # HWC to CHW
+                img = np.ascontiguousarray(img[::-1] if random.uniform(0, 1) > self.bgr else img)
+                img = torch.from_numpy(img)
+                return img
+            else:
+                LOGGER.warning(f"不支持的图像类型: {type(img)}")
+                # 创建一个随机图像作为替代
+                return torch.zeros((3, 640, 640), dtype=torch.float32)
+        except Exception as e:
+            LOGGER.error(f"处理图像时发生错误: {e}")
+            # 返回空图像
+            return torch.zeros((3, 640, 640), dtype=torch.float32)
 
     def _format_segments(self, instances, cls, w, h):
         """
         Converts polygon segments to bitmap masks.
-        
+
         Args:
             instances (Instances): Object containing segment information.
             cls (numpy.ndarray): Class labels for each instance.
             w (int): Width of the image.
             h (int): Height of the image.
-        
+
         Returns:
             masks (numpy.ndarray): Bitmap masks with shape (N, H, W) or (1, H, W) if mask_overlap is True.
             instances (Instances): Updated instances object with sorted segments if mask_overlap is True.
             cls (numpy.ndarray): Updated class labels, sorted if mask_overlap is True.
-        
+
         Notes:
             - If self.mask_overlap is True, masks are overlapped and sorted by area.
             - If self.mask_overlap is False, each mask is represented separately.
@@ -2375,18 +2376,30 @@ def v8_transforms(dataset, imgsz, hyp, stretch=False):
                 mode=hyp.copy_paste_mode,
             )
         )
-    
-    # 安全检查：确保dataset.data不为None
-    data_dict = getattr(dataset, "data", {}) or {}
-    flip_idx = data_dict.get("flip_idx", [])  # 防止dataset.data为None的情况
-    
+    flip_idx = dataset.data.get("flip_idx", [])  # for keypoints augmentation
     if dataset.use_keypoints:
-        kpt_shape = data_dict.get("kpt_shape", None)
+        kpt_shape = dataset.data.get("kpt_shape", None)
         if len(flip_idx) == 0 and hyp.fliplr > 0.0:
             hyp.fliplr = 0.0
             LOGGER.warning("WARNING ⚠️ No 'flip_idx' array defined in data.yaml, setting augmentation 'fliplr=0.0'")
         elif flip_idx and (len(flip_idx) != kpt_shape[0]):
             raise ValueError(f"data.yaml flip_idx={flip_idx} length must be equal to kpt_shape[0]={kpt_shape[0]}")
+    
+    # 检查数据集是否有番茄特有属性，如果有则使用TomatoFormat，否则使用标准Format
+    has_tomato_attrs = getattr(dataset, "has_cluster_id", False) or getattr(dataset, "has_h_rel", False)
+    
+    # 创建格式化器 - 根据数据集类型选择不同的格式化类
+    formatter_class = TomatoFormat if has_tomato_attrs else Format
+    formatter = formatter_class(
+        bbox_format='xywh',
+        normalize=True,
+        return_mask=False,
+        return_keypoint=dataset.use_keypoints,
+        return_obb=False,
+    )
+    
+    if has_tomato_attrs:
+        LOGGER.info(f"使用TomatoFormat以保留番茄特有属性 (cluster_ids, h_rel)")
 
     return Compose(
         [
@@ -2396,6 +2409,7 @@ def v8_transforms(dataset, imgsz, hyp, stretch=False):
             RandomHSV(hgain=hyp.hsv_h, sgain=hyp.hsv_s, vgain=hyp.hsv_v),
             RandomFlip(direction="vertical", p=hyp.flipud),
             RandomFlip(direction="horizontal", p=hyp.fliplr, flip_idx=flip_idx),
+            formatter,  # 使用选择的格式化器
         ]
     )  # transforms
 
@@ -2800,3 +2814,120 @@ class ToTensor:
         im = im.half() if self.half else im.float()  # uint8 to fp16/32
         im /= 255.0  # 0-255 to 0.0-1.0
         return im
+
+
+class TomatoFormat(Format):
+    """
+    专门为番茄检测任务扩展的Format类，处理cluster_ids和h_rel属性。
+    继承原始Format类，增加对番茄特有属性的支持。
+    """
+    
+    def __init__(
+        self, 
+        bbox_format="xywh",
+        normalize=True,
+        return_mask=False,
+        return_keypoint=False,
+        return_obb=False,
+        mask_ratio=4,
+        mask_overlap=True,
+        batch_idx=True,
+        bgr=0.0,
+    ):
+        """初始化TomatoFormat类，总是启用番茄特有属性支持"""
+        super().__init__(
+            bbox_format=bbox_format,
+            normalize=normalize,
+            return_mask=return_mask,
+            return_keypoint=return_keypoint,
+            return_obb=return_obb,
+            mask_ratio=mask_ratio,
+            mask_overlap=mask_overlap,
+            batch_idx=batch_idx,
+            bgr=bgr,
+        )
+    
+    def __call__(self, labels):
+        """
+        Applies formatting to the labels dictionary.
+        This simplified and robust version replaces the complex previous one.
+        """
+        img = labels.pop("img")
+        h, w = img.shape[:2]
+        
+        instances = labels.pop("instances", Instances(bboxes=np.zeros((0, 4))))
+        cls = labels.pop("cls", np.zeros(0))
+        nl = len(instances)
+
+        # Normalize bboxes if they are not already
+        if not instances.normalized:
+            instances.normalize(w, h)
+        
+        # Convert bbox format to xywh for consistency
+        instances.convert_bbox(format='xywh')
+
+        # Combine standard and custom data into a single tensor
+        # Start with cls and bboxes
+        lb = [torch.from_numpy(cls).unsqueeze(1), torch.from_numpy(instances.bboxes)]
+
+        # Append custom fields if they exist on the Instances object
+        if hasattr(instances, 'cluster_ids') and instances.cluster_ids is not None:
+            lb.append(torch.from_numpy(instances.cluster_ids).unsqueeze(1))
+        else: # Add placeholder if not exists
+            lb.append(torch.zeros((nl, 1)))
+            
+        if hasattr(instances, 'h_rel') and instances.h_rel is not None:
+            lb.append(torch.from_numpy(instances.h_rel).unsqueeze(1))
+        else: # Add placeholder
+            lb.append(torch.full((nl, 1), -1.0)) # Use -1.0 for unknown h_rel
+        
+        # Concatenate all parts
+        lb = torch.cat(lb, 1)
+
+        # Create the final batch dictionary
+        formatted_labels = {
+            "img": self._format_img(img),
+            # THE GOAL: A single, clean 'labels' tensor
+            "labels": lb.float()
+        }
+
+        return formatted_labelss
+
+    def _format_img(self, img):
+        """
+        番茄专用图像处理函数，处理不同格式的图像
+        """
+        try:
+            # 处理已经是PyTorch Tensor的情况
+            if isinstance(img, torch.Tensor):
+                # 如果已经是CHW格式，直接返回
+                if img.ndim == 3 and img.shape[0] in [1, 3, 4]:  # 已经是CHW格式
+                    return img
+                # 如果是HWC格式，转换为CHW
+                elif img.ndim == 3 and img.shape[2] in [1, 3, 4]:  # HWC格式
+                    img = img.permute(2, 0, 1)
+                    return img.contiguous()[::-1] if random.uniform(0, 1) > self.bgr else img.contiguous()
+                # 如果是灰度图，添加通道维度
+                elif img.ndim == 2:  # 灰度图
+                    img = img.unsqueeze(0)
+                    return img.contiguous()
+                else:
+                    LOGGER.warning(f"TomatoFormat: 无法处理的图像格式: {img.shape}")
+                    # 创建一个随机图像作为替代
+                    return torch.zeros((3, 640, 640), dtype=torch.float32)
+            # 处理NumPy数组
+            elif isinstance(img, np.ndarray):
+                if len(img.shape) < 3:
+                    img = np.expand_dims(img, -1)
+                img = np.transpose(img, (2, 0, 1))  # HWC to CHW
+                img = np.ascontiguousarray(img[::-1] if random.uniform(0, 1) > self.bgr else img)
+                img = torch.from_numpy(img)
+                return img
+            else:
+                LOGGER.warning(f"TomatoFormat: 不支持的图像类型: {type(img)}")
+                # 创建一个随机图像作为替代
+                return torch.zeros((3, 640, 640), dtype=torch.float32)
+        except Exception as e:
+            LOGGER.error(f"TomatoFormat: 处理图像时发生错误: {e}")
+            # 返回空图像
+            return torch.zeros((3, 640, 640), dtype=torch.float32)
