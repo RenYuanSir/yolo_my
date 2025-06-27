@@ -1,0 +1,237 @@
+2025-06-25 15:33:29,204 - test_augment_tomato - INFO - 开始测试番茄数据集的数据增强过程
+2025-06-25 15:33:29,205 - test_augment_tomato - INFO - 创建模拟数据集成功: 10 张图像
+2025-06-25 15:33:29,205 - test_augment_tomato - INFO - 数据集属性: has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,205 - test_augment_tomato - INFO - 获取样本 0 成功
+2025-06-25 15:33:29,206 - test_augment_tomato - INFO - 原始样本 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:33:29,206 - test_augment_tomato - INFO - 原始样本 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,208 - test_augment_tomato - INFO - 原始样本 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,208 - test_augment_tomato - INFO - 原始样本 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,209 - test_augment_tomato - INFO - 开始应用变换...
+2025-06-25 15:33:29,209 - test_augment_tomato - INFO - 开始应用Compose，共有 3 个变换
+2025-06-25 15:33:29,209 - test_augment_tomato - INFO - 应用变换 0: DebugTransform
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - ===== 开始应用变换: Mosaic =====
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:33:29,210 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,211 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,211 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,211 - test_augment_tomato - ERROR - 应用变换 Mosaic 时出错: 'MockTomatoDataset' object has no attribute 'buffer'
+2025-06-25 15:33:29,217 - test_augment_tomato - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_augment_tomato.py", line 130, in __call__
+    result = self.transform(deepcopy(labels))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 390, in __call__
+    indexes = self.get_indexes()
+              ^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 566, in get_indexes
+    return random.choices(list(self.dataset.buffer), k=self.n - 1)
+                               ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockTomatoDataset' object has no attribute 'buffer'
+
+2025-06-25 15:33:29,217 - test_augment_tomato - INFO - 变换 DebugTransform 后: instances存在，长度=2
+2025-06-25 15:33:29,217 - test_augment_tomato - INFO - 变换 DebugTransform 后: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:33:29,217 - test_augment_tomato - INFO - 变换 DebugTransform 后: h_rel存在，形状=(2, 1)
+2025-06-25 15:33:29,217 - test_augment_tomato - INFO - 应用变换 1: DebugTransform
+2025-06-25 15:33:29,218 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:33:29,218 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - ===== 开始应用变换: RandomPerspective =====
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,219 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,222 - test_augment_tomato - INFO - 变换 RandomPerspective 应用成功
+2025-06-25 15:33:29,222 - test_augment_tomato - INFO - 输出 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:33:29,222 - test_augment_tomato - INFO - 输出 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,222 - test_augment_tomato - INFO - 输出 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 输出 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - ===== 完成变换: RandomPerspective =====
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 变换 DebugTransform 后: instances存在，长度=2
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 变换 DebugTransform 后: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 变换 DebugTransform 后: h_rel存在，形状=(2, 1)
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 应用变换 2: DebugTransform
+2025-06-25 15:33:29,223 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - ===== 开始应用变换: TomatoFormat =====
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,224 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:33:29,225 - test_augment_tomato - INFO - 变换 TomatoFormat 应用成功
+2025-06-25 15:33:29,226 - test_augment_tomato - WARNING - 输出标签中没有instances字段!
+2025-06-25 15:33:29,226 - test_augment_tomato - INFO - 输出中有独立的cluster_ids字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:33:29,226 - test_augment_tomato - INFO - 输出中有独立的h_rel字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:33:29,226 - test_augment_tomato - INFO - ===== 完成变换: TomatoFormat =====
+2025-06-25 15:33:29,226 - test_augment_tomato - WARNING - 变换 DebugTransform 后: instances不存在!
+2025-06-25 15:33:29,227 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的cluster_ids存在，形状=torch.Size([2, 1])
+2025-06-25 15:33:29,227 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的h_rel存在，形状=torch.Size([2, 1])
+2025-06-25 15:33:29,227 - test_augment_tomato - INFO - 变换应用完成
+2025-06-25 15:33:29,227 - test_augment_tomato - WARNING - 变换后的样本不包含instances字段!
+2025-06-25 15:33:29,227 - test_augment_tomato - INFO - 变换后的样本包含独立的cluster_ids字段: 形状=torch.Size([2, 1])
+2025-06-25 15:33:29,227 - test_augment_tomato - INFO - 变换后的样本包含独立的h_rel字段: 形状=torch.Size([2, 1])
+2025-06-25 15:33:29,228 - test_augment_tomato - INFO - 变换后的样本字段: ['im_file', 'ori_shape', 'resized_shape', 'batch_idx', 'img', 'cls', 'bboxes', 'cluster_ids', 'h_rel']
+2025-06-25 15:33:29,228 - test_augment_tomato - INFO - 测试标准v8_transforms...
+2025-06-25 15:33:33,188 - test_augment_tomato - ERROR - 测试过程中出错: 'MockTomatoDataset' object has no attribute 'buffer'
+2025-06-25 15:33:33,188 - test_augment_tomato - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_augment_tomato.py", line 330, in test_augment_tomato
+    standard_transformed = standard_transforms(sample)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 390, in __call__
+    indexes = self.get_indexes()
+              ^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 566, in get_indexes
+    return random.choices(list(self.dataset.buffer), k=self.n - 1)
+                               ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockTomatoDataset' object has no attribute 'buffer'
+
+2025-06-25 15:33:33,189 - test_augment_tomato - ERROR - 测试失败！
+2025-06-25 15:36:43,903 - test_augment_tomato - INFO - 开始测试番茄数据集的数据增强过程
+2025-06-25 15:36:43,903 - test_augment_tomato - INFO - 创建模拟数据集成功: 10 张图像
+2025-06-25 15:36:43,903 - test_augment_tomato - INFO - 数据集属性: has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,905 - test_augment_tomato - INFO - 获取样本 0 成功
+2025-06-25 15:36:43,905 - test_augment_tomato - INFO - 原始样本 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:36:43,905 - test_augment_tomato - INFO - 原始样本 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,905 - test_augment_tomato - INFO - 原始样本 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,906 - test_augment_tomato - INFO - 原始样本 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,906 - test_augment_tomato - INFO - 开始应用变换...
+2025-06-25 15:36:43,906 - test_augment_tomato - INFO - 开始应用Compose，共有 2 个变换
+2025-06-25 15:36:43,906 - test_augment_tomato - INFO - 应用变换 0: DebugTransform
+2025-06-25 15:36:43,906 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:36:43,907 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:36:43,907 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:36:43,907 - test_augment_tomato - INFO - ===== 开始应用变换: RandomPerspective =====
+2025-06-25 15:36:43,907 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:36:43,907 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,908 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,908 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,910 - test_augment_tomato - INFO - 变换 RandomPerspective 应用成功
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - 输出 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - 输出 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - 输出 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - 输出 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - ===== 完成变换: RandomPerspective =====
+2025-06-25 15:36:43,911 - test_augment_tomato - INFO - 变换 DebugTransform 后: instances存在，长度=2
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 变换 DebugTransform 后: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 变换 DebugTransform 后: h_rel存在，形状=(2, 1)
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 应用变换 1: DebugTransform
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - ===== 开始应用变换: TomatoFormat =====
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,912 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,913 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,914 - test_augment_tomato - INFO - 变换 TomatoFormat 应用成功
+2025-06-25 15:36:43,914 - test_augment_tomato - WARNING - 输出标签中没有instances字段!
+2025-06-25 15:36:43,914 - test_augment_tomato - INFO - 输出中有独立的cluster_ids字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:36:43,914 - test_augment_tomato - INFO - 输出中有独立的h_rel字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:36:43,914 - test_augment_tomato - INFO - ===== 完成变换: TomatoFormat =====
+2025-06-25 15:36:43,914 - test_augment_tomato - WARNING - 变换 DebugTransform 后: instances不存在!
+2025-06-25 15:36:43,915 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的cluster_ids存在，形状=torch.Size([2, 1])
+2025-06-25 15:36:43,915 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的h_rel存在，形状=torch.Size([2, 1])
+2025-06-25 15:36:43,915 - test_augment_tomato - INFO - 变换应用完成
+2025-06-25 15:36:43,915 - test_augment_tomato - WARNING - 变换后的样本不包含instances字段!
+2025-06-25 15:36:43,917 - test_augment_tomato - INFO - 变换后的样本包含独立的cluster_ids字段: 形状=torch.Size([2, 1])
+2025-06-25 15:36:43,917 - test_augment_tomato - INFO - 变换后的样本包含独立的h_rel字段: 形状=torch.Size([2, 1])
+2025-06-25 15:36:43,917 - test_augment_tomato - INFO - 变换后的样本字段: ['im_file', 'ori_shape', 'resized_shape', 'batch_idx', 'img', 'cls', 'bboxes', 'cluster_ids', 'h_rel']
+2025-06-25 15:36:43,917 - test_augment_tomato - INFO - 
+
+直接测试TomatoFormat...
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 获取新样本成功
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 新样本 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 新样本 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 新样本 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 新样本 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:36:43,918 - test_augment_tomato - INFO - 开始应用TomatoFormat...
+2025-06-25 15:36:43,919 - test_augment_tomato - INFO - TomatoFormat应用完成
+2025-06-25 15:36:43,919 - test_augment_tomato - INFO - 格式化后的样本字段: ['im_file', 'ori_shape', 'resized_shape', 'batch_idx', 'img', 'cls', 'bboxes', 'cluster_ids', 'h_rel']
+2025-06-25 15:36:43,919 - test_augment_tomato - INFO - 格式化后的样本包含cluster_ids字段: 形状=torch.Size([2, 1]), 类型=torch.float32
+2025-06-25 15:36:43,921 - test_augment_tomato - INFO - cluster_ids内容: tensor([[1.],
+        [2.]])
+2025-06-25 15:36:43,921 - test_augment_tomato - INFO - 格式化后的样本包含h_rel字段: 形状=torch.Size([2, 1]), 类型=torch.float32
+2025-06-25 15:36:43,921 - test_augment_tomato - INFO - h_rel内容: tensor([[0.5000],
+        [0.7000]])
+2025-06-25 15:36:43,922 - test_augment_tomato - INFO - 测试成功完成！
+2025-06-25 15:39:44,671 - test_augment_tomato - INFO - 开始测试番茄数据集的数据增强过程
+2025-06-25 15:39:44,671 - test_augment_tomato - INFO - 创建模拟数据集成功: 10 张图像
+2025-06-25 15:39:44,672 - test_augment_tomato - INFO - 数据集属性: has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,672 - test_augment_tomato - INFO - 获取样本 0 成功
+2025-06-25 15:39:44,672 - test_augment_tomato - INFO - 原始样本 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,672 - test_augment_tomato - INFO - 原始样本 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,672 - test_augment_tomato - INFO - 原始样本 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 原始样本 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 开始应用变换...
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 开始应用Compose，共有 2 个变换
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 应用变换 0: DebugTransform
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:39:44,673 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:39:44,675 - test_augment_tomato - INFO - ===== 开始应用变换: RandomPerspective =====
+2025-06-25 15:39:44,675 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,675 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,675 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,675 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 变换 RandomPerspective 应用成功
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 输出 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 输出 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 输出 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 输出 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - ===== 完成变换: RandomPerspective =====
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 变换 DebugTransform 后: instances存在，长度=2
+2025-06-25 15:39:44,679 - test_augment_tomato - INFO - 变换 DebugTransform 后: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 变换 DebugTransform 后: h_rel存在，形状=(2, 1)
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 应用变换 1: DebugTransform
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 变换 DebugTransform 前: instances存在，长度=2
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 变换 DebugTransform 前: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 变换 DebugTransform 前: h_rel存在，形状=(2, 1)
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - ===== 开始应用变换: TomatoFormat =====
+2025-06-25 15:39:44,680 - test_augment_tomato - INFO - 输入 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,681 - test_augment_tomato - INFO - 输入 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,681 - test_augment_tomato - INFO - 输入 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,681 - test_augment_tomato - INFO - 输入 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 变换 TomatoFormat 应用成功
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出中有独立的cluster_ids字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:39:44,682 - test_augment_tomato - INFO - 输出中有独立的h_rel字段: 类型=<class 'torch.Tensor'>, 形状=torch.Size([2, 1])
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - ===== 完成变换: TomatoFormat =====
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换 DebugTransform 后: instances存在，长度=2
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换 DebugTransform 后: cluster_ids存在，形状=(2, 1)
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换 DebugTransform 后: h_rel存在，形状=(2, 1)
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的cluster_ids存在，形状=torch.Size([2, 1])
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换 DebugTransform 后: 独立的h_rel存在，形状=torch.Size([2, 1])
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换应用完成
+2025-06-25 15:39:44,683 - test_augment_tomato - INFO - 变换后的样本包含instances字段
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 变换后的样本包含独立的cluster_ids字段: 形状=torch.Size([2, 1])
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 变换后的样本包含独立的h_rel字段: 形状=torch.Size([2, 1])
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 变换后的样本字段: ['im_file', 'ori_shape', 'resized_shape', 'batch_idx', 'img', 'cls', 'bboxes', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 
+
+直接测试TomatoFormat...
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 获取新样本成功
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 新样本 instances: 类型=<class 'ultralytics.utils.instance.Instances'>, 长度=2
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 新样本 has_cluster_ids=True, has_h_rel=True
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 新样本 cluster_ids: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 新样本 h_rel: 类型=<class 'numpy.ndarray'>, 形状=(2, 1)
+2025-06-25 15:39:44,684 - test_augment_tomato - INFO - 开始应用TomatoFormat...
+2025-06-25 15:39:44,686 - test_augment_tomato - INFO - TomatoFormat应用完成
+2025-06-25 15:39:44,686 - test_augment_tomato - INFO - 格式化后的样本字段: ['im_file', 'ori_shape', 'resized_shape', 'batch_idx', 'img', 'cls', 'bboxes', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:39:44,687 - test_augment_tomato - INFO - 格式化后的样本包含cluster_ids字段: 形状=torch.Size([2, 1]), 类型=torch.float32
+2025-06-25 15:39:44,688 - test_augment_tomato - INFO - cluster_ids内容: tensor([[1.],
+        [2.]])
+2025-06-25 15:39:44,688 - test_augment_tomato - INFO - 格式化后的样本包含h_rel字段: 形状=torch.Size([2, 1]), 类型=torch.float32
+2025-06-25 15:39:44,689 - test_augment_tomato - INFO - h_rel内容: tensor([[0.5000],
+        [0.7000]])
+2025-06-25 15:39:44,689 - test_augment_tomato - INFO - 测试成功完成！

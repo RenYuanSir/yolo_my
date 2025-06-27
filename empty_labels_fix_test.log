@@ -1,0 +1,204 @@
+2025-06-25 20:58:59,424 - matplotlib - DEBUG - matplotlib data path: D:\anaconda\envs\yolov12\Lib\site-packages\matplotlib\mpl-data
+2025-06-25 20:58:59,435 - matplotlib - DEBUG - CONFIGDIR=C:\Users\87969\.matplotlib
+2025-06-25 20:58:59,438 - matplotlib - DEBUG - interactive is False
+2025-06-25 20:58:59,439 - matplotlib - DEBUG - platform is win32
+2025-06-25 20:58:59,496 - matplotlib - DEBUG - CACHEDIR=C:\Users\87969\.matplotlib
+2025-06-25 20:58:59,499 - matplotlib.font_manager - DEBUG - Using fontManager instance from C:\Users\87969\.matplotlib\fontlist-v390.json
+2025-06-25 20:59:05,204 - test_empty_labels_fix - INFO - 开始运行所有测试
+2025-06-25 20:59:05,204 - test_empty_labels_fix - INFO - 开始测试空实例处理
+2025-06-25 20:59:05,206 - test_empty_labels_fix - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 20:59:05,207 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 20:59:05,207 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 20:59:05,210 - test_empty_labels_fix - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 20:59:05,212 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 20:59:05,213 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 20:59:05,214 - test_empty_labels_fix - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 20:59:05,215 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 20:59:05,216 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 20:59:05,227 - test_empty_labels_fix - INFO - 开始测试数据集的collate_fn函数
+2025-06-25 20:59:05,227 - test_empty_labels_fix - INFO - 创建有标签的数据集
+2025-06-25 20:59:05,227 - test_empty_labels_fix - INFO - 创建测试虚拟数据集，with_labels=True
+2025-06-25 21:01:09,826 - matplotlib - DEBUG - matplotlib data path: D:\anaconda\envs\yolov12\Lib\site-packages\matplotlib\mpl-data
+2025-06-25 21:01:09,838 - matplotlib - DEBUG - CONFIGDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:01:09,839 - matplotlib - DEBUG - interactive is False
+2025-06-25 21:01:09,839 - matplotlib - DEBUG - platform is win32
+2025-06-25 21:01:09,903 - matplotlib - DEBUG - CACHEDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:01:09,906 - matplotlib.font_manager - DEBUG - Using fontManager instance from C:\Users\87969\.matplotlib\fontlist-v390.json
+2025-06-25 21:01:16,990 - test_empty_labels_fix - INFO - 开始运行所有测试
+2025-06-25 21:01:16,990 - test_empty_labels_fix - INFO - 开始测试空实例处理
+2025-06-25 21:01:16,990 - test_empty_labels_fix - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:01:16,991 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:01:16,991 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:01:16,993 - test_empty_labels_fix - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:01:16,995 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:01:16,995 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:01:16,996 - test_empty_labels_fix - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:01:16,997 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:01:16,997 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:01:17,007 - test_empty_labels_fix - INFO - 开始测试数据集的collate_fn函数
+2025-06-25 21:01:17,007 - test_empty_labels_fix - INFO - 创建有标签的数据集
+2025-06-25 21:01:17,007 - test_empty_labels_fix - INFO - 创建测试虚拟数据集，with_labels=True
+2025-06-25 21:02:18,011 - matplotlib - DEBUG - matplotlib data path: D:\anaconda\envs\yolov12\Lib\site-packages\matplotlib\mpl-data
+2025-06-25 21:02:18,022 - matplotlib - DEBUG - CONFIGDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:02:18,024 - matplotlib - DEBUG - interactive is False
+2025-06-25 21:02:18,024 - matplotlib - DEBUG - platform is win32
+2025-06-25 21:02:18,081 - matplotlib - DEBUG - CACHEDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:02:18,084 - matplotlib.font_manager - DEBUG - Using fontManager instance from C:\Users\87969\.matplotlib\fontlist-v390.json
+2025-06-25 21:02:24,551 - test_empty_labels_fix - INFO - 开始运行所有测试
+2025-06-25 21:02:24,552 - test_empty_labels_fix - INFO - 开始测试空实例处理
+2025-06-25 21:02:24,552 - test_empty_labels_fix - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:02:24,553 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:02:24,553 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:02:24,555 - test_empty_labels_fix - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:02:24,556 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:02:24,556 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:02:24,558 - test_empty_labels_fix - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:02:24,558 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:02:24,559 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:02:24,569 - test_empty_labels_fix - INFO - 开始测试数据集的collate_fn函数
+2025-06-25 21:02:24,570 - test_empty_labels_fix - INFO - 创建有标签的数据集
+2025-06-25 21:02:24,570 - test_empty_labels_fix - INFO - 创建测试虚拟数据集，with_labels=True
+2025-06-25 21:04:32,455 - matplotlib - DEBUG - matplotlib data path: D:\anaconda\envs\yolov12\Lib\site-packages\matplotlib\mpl-data
+2025-06-25 21:04:32,468 - matplotlib - DEBUG - CONFIGDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:04:32,469 - matplotlib - DEBUG - interactive is False
+2025-06-25 21:04:32,470 - matplotlib - DEBUG - platform is win32
+2025-06-25 21:04:32,524 - matplotlib - DEBUG - CACHEDIR=C:\Users\87969\.matplotlib
+2025-06-25 21:04:32,527 - matplotlib.font_manager - DEBUG - Using fontManager instance from C:\Users\87969\.matplotlib\fontlist-v390.json
+2025-06-25 21:04:38,606 - test_empty_labels_fix - INFO - 开始运行所有测试
+2025-06-25 21:04:38,606 - test_empty_labels_fix - INFO - 开始测试空实例处理
+2025-06-25 21:04:38,606 - test_empty_labels_fix - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:04:38,608 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:04:38,608 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:04:38,610 - test_empty_labels_fix - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:04:38,611 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:04:38,612 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:04:38,613 - test_empty_labels_fix - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:04:38,614 - test_empty_labels_fix - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:04:38,614 - test_empty_labels_fix - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:04:38,624 - test_empty_labels_fix - INFO - 所有测试完成
+2025-06-25 21:45:34,842 - EmptyLabelsTest - INFO - 开始运行所有测试
+2025-06-25 21:45:34,842 - EmptyLabelsTest - INFO - 开始测试空实例处理
+2025-06-25 21:45:34,842 - EmptyLabelsTest - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:45:34,845 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:45:34,845 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:45:34,849 - EmptyLabelsTest - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:45:34,849 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:45:34,849 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:45:34,850 - EmptyLabelsTest - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:45:34,851 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:45:34,851 - EmptyLabelsTest - INFO - cluster_ids形状: (2, 1), h_rel形状: (2, 1)
+2025-06-25 21:45:34,860 - EmptyLabelsTest - ERROR - 测试情况3失败: 'numpy.ndarray' object has no attribute 'numpy'
+2025-06-25 21:45:34,860 - EmptyLabelsTest - INFO - === 测试标准Format处理空标签 ===
+2025-06-25 21:45:34,861 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 21:45:34,861 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:45:34,861 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:45:34,861 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:45:34,861 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:45:34,862 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理空标签 ===
+2025-06-25 21:45:34,863 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:45:34,863 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:45:34,863 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   生成了cluster_ids字段: torch.Size([0, 1])
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO -   生成了h_rel字段: torch.Size([0, 1])
+2025-06-25 21:45:34,864 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理有数据的标签 ===
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO - 成功格式化带数据标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([1, 4]), 类型=torch.float32
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([1]), 类型=torch.float32
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:45:34,865 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:45:34,867 - EmptyLabelsTest - INFO -   cluster_ids字段值: tensor([[1.]])
+2025-06-25 21:45:34,867 - EmptyLabelsTest - INFO -   h_rel字段值: tensor([[0.5000]])
+2025-06-25 21:45:34,869 - EmptyLabelsTest - INFO - 所有测试完成
+2025-06-25 21:49:08,683 - EmptyLabelsTest - INFO - 开始运行所有测试
+2025-06-25 21:49:08,683 - EmptyLabelsTest - INFO - 开始测试空实例处理
+2025-06-25 21:49:08,683 - EmptyLabelsTest - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:49:08,688 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:49:08,688 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:49:08,691 - EmptyLabelsTest - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:49:08,691 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:49:08,691 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:49:08,693 - EmptyLabelsTest - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:49:08,693 - EmptyLabelsTest - ERROR - 测试情况3失败: name 'formatter' is not defined
+2025-06-25 21:49:08,694 - EmptyLabelsTest - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_empty_labels_fix.py", line 345, in test_empty_instance_handling
+    result3 = formatter(test_label3)
+              ^^^^^^^^^
+NameError: name 'formatter' is not defined
+
+2025-06-25 21:49:08,694 - EmptyLabelsTest - INFO - === 测试标准Format处理空标签 ===
+2025-06-25 21:49:08,695 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 21:49:08,695 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:49:08,695 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:49:08,695 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:49:08,695 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:49:08,696 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理空标签 ===
+2025-06-25 21:49:08,696 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   生成了cluster_ids字段: torch.Size([0, 1])
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO -   生成了h_rel字段: torch.Size([0, 1])
+2025-06-25 21:49:08,697 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理有数据的标签 ===
+2025-06-25 21:49:08,698 - EmptyLabelsTest - INFO - 成功格式化带数据标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:49:08,698 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:49:08,698 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:49:08,698 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([1, 4]), 类型=torch.float32
+2025-06-25 21:49:08,698 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([1]), 类型=torch.float32
+2025-06-25 21:49:08,699 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:49:08,699 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:49:08,700 - EmptyLabelsTest - INFO -   cluster_ids字段值: tensor([[1.]])
+2025-06-25 21:49:08,701 - EmptyLabelsTest - INFO -   h_rel字段值: tensor([[0.5000]])
+2025-06-25 21:49:08,701 - EmptyLabelsTest - INFO - 所有测试完成
+2025-06-25 21:53:11,079 - EmptyLabelsTest - INFO - 开始运行所有测试
+2025-06-25 21:53:11,079 - EmptyLabelsTest - INFO - 开始测试空实例处理
+2025-06-25 21:53:11,079 - EmptyLabelsTest - INFO - 测试情况1：完全没有instances的标签
+2025-06-25 21:53:11,082 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:53:11,082 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([0, 1]), h_rel形状: torch.Size([0, 1])
+2025-06-25 21:53:11,085 - EmptyLabelsTest - INFO - 测试情况2：instances对象存在，但没有cluster_ids和h_rel
+2025-06-25 21:53:11,085 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:53:11,085 - EmptyLabelsTest - INFO - cluster_ids形状: torch.Size([2, 1]), h_rel形状: torch.Size([2, 1])
+2025-06-25 21:53:11,086 - EmptyLabelsTest - INFO - 测试情况3：标签直接包含cluster_ids和h_rel，但没有instances
+2025-06-25 21:53:11,087 - EmptyLabelsTest - INFO - 处理成功，结果字段: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:53:11,087 - EmptyLabelsTest - INFO - cluster_ids形状: (2, 1), h_rel形状: (2, 1)
+2025-06-25 21:53:11,088 - EmptyLabelsTest - INFO - === 测试标准Format处理空标签 ===
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:53:11,089 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理空标签 ===
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO - 成功格式化空标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([0, 4]), 类型=torch.float32
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([0]), 类型=torch.float32
+2025-06-25 21:53:11,090 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:53:11,091 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([0, 1]), 类型=torch.float32
+2025-06-25 21:53:11,091 - EmptyLabelsTest - INFO -   生成了cluster_ids字段: torch.Size([0, 1])
+2025-06-25 21:53:11,091 - EmptyLabelsTest - INFO -   生成了h_rel字段: torch.Size([0, 1])
+2025-06-25 21:53:11,091 - EmptyLabelsTest - INFO - 
+=== 测试TomatoFormat处理有数据的标签 ===
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO - 成功格式化带数据标签: ['img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   img: 形状=torch.Size([3, 640, 640]), 类型=torch.float32
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   cls: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   bboxes: 形状=torch.Size([1, 4]), 类型=torch.float32
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   batch_idx: 形状=torch.Size([1]), 类型=torch.float32
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   cluster_ids: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:53:11,092 - EmptyLabelsTest - INFO -   h_rel: 形状=torch.Size([1, 1]), 类型=torch.float32
+2025-06-25 21:53:11,094 - EmptyLabelsTest - INFO -   cluster_ids字段值: tensor([[1.]])
+2025-06-25 21:53:11,095 - EmptyLabelsTest - INFO -   h_rel字段值: tensor([[0.5000]])
+2025-06-25 21:53:11,095 - EmptyLabelsTest - INFO - 所有测试完成

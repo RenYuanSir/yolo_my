@@ -1,0 +1,1972 @@
+2025-06-25 14:47:04,059 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:47:04,061 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:47:18,847 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:47:18,848 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:47:27,893 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:47:27,893 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:47:27,893 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:47:27,893 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:47:27,895 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:47:27,895 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:47:27,895 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:47:33,165 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:47:33,167 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:47:33,168 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:47:33,168 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:47:33,168 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:47:33,169 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:47:33,171 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:47:33,171 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:47:33,171 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:47:33,171 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:47:33,173 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:47:33,174 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:47:33,174 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,174 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:47:33,174 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:47:33,174 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:47:33,175 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,175 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,175 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,175 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,175 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,176 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:47:33,176 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,176 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:47:33,176 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,176 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,176 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,177 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,178 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: 'Instances' object has no attribute 'bbox_format'
+2025-06-25 14:47:33,180 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 539, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Instances' object has no attribute 'bbox_format'
+
+2025-06-25 14:47:33,180 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:47:33,181 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,181 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:47:33,181 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,181 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,182 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,182 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,182 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:47:33,182 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,183 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:47:33,183 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,183 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,183 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,183 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,183 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:47:33,184 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:47:33,184 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,184 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:47:33,184 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,184 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,189 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:47:33,190 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:47:33,190 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:47:33,190 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:47:33,191 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:47:33,191 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,191 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:47:33,192 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,192 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,192 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,192 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,192 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,192 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,192 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:47:33,194 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:47:33,194 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,194 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:47:33,195 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,195 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,195 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,195 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,195 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,195 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,199 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:47:33,199 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:47:33,201 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,202 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,202 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,202 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:47:33,202 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,202 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,203 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,203 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,205 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,205 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,205 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,205 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,205 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:47:33,206 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:47:33,206 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:47:33,207 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:47:33,207 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:47:33,207 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:47:33,208 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:47:33,208 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:47:33,208 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:47:33,208 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:47:33,208 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:47:33,209 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:47:33,209 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:47:33,209 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:47:33,212 - data_loading_test - ERROR - 测试__getitem__方法时出错: 'Instances' object has no attribute 'bbox_format'
+2025-06-25 14:47:33,213 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 539, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Instances' object has no attribute 'bbox_format'
+
+2025-06-25 14:47:33,214 - data_loading_test - INFO - 测试完成
+2025-06-25 14:47:33,214 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:47:33,214 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:49:10,718 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:49:10,718 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:49:23,400 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:49:23,400 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:49:29,678 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:49:29,680 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:49:29,680 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:49:29,680 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:49:29,681 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:49:29,681 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:49:29,682 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:49:34,832 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:49:34,832 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:49:34,833 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:49:34,834 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:49:34,834 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:49:34,834 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:49:34,834 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:49:34,836 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:49:34,836 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:49:34,836 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:49:34,836 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:49:34,838 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:49:34,838 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:49:34,839 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:49:34,839 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:49:34,840 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,840 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:49:34,840 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,840 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:49:34,840 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,840 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,840 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,840 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,841 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:49:34,841 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,841 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:49:34,841 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,841 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,841 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,842 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,843 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: 'Bboxes' object has no attribute 'ndim'
+2025-06-25 14:49:34,844 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 544, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 222, in __init__
+    self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 54, in __init__
+    bboxes = bboxes[None, :] if bboxes.ndim == 1 else bboxes
+                                ^^^^^^^^^^^
+AttributeError: 'Bboxes' object has no attribute 'ndim'
+
+2025-06-25 14:49:34,844 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,846 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,846 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,846 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,846 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:49:34,847 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,847 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,847 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,847 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,847 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:49:34,847 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:49:34,848 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,848 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:49:34,848 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,848 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,851 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:49:34,851 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:49:34,851 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,851 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,851 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:49:34,852 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,852 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,853 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,853 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,854 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,854 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:49:34,854 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,854 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,854 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,855 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,855 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,855 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,857 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:49:34,857 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,859 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:49:34,859 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,860 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,860 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,860 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,860 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,860 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,860 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:49:34,860 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:49:34,861 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,862 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,862 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,862 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:49:34,862 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:49:34,862 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:49:34,863 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:49:34,863 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:49:34,864 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:49:34,864 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:49:34,864 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:49:34,864 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:49:34,865 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:49:34,865 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:49:34,865 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:49:34,865 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:49:34,866 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:49:34,866 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:49:34,868 - data_loading_test - ERROR - 测试__getitem__方法时出错: 'Bboxes' object has no attribute 'ndim'
+2025-06-25 14:49:34,870 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 544, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 222, in __init__
+    self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 54, in __init__
+    bboxes = bboxes[None, :] if bboxes.ndim == 1 else bboxes
+                                ^^^^^^^^^^^
+AttributeError: 'Bboxes' object has no attribute 'ndim'
+
+2025-06-25 14:49:34,870 - data_loading_test - INFO - 测试完成
+2025-06-25 14:49:34,870 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:49:34,871 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:50:43,882 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:50:43,883 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:50:50,310 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:50:50,311 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:50:50,311 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:50:50,311 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:50:50,311 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:50:50,312 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:50:50,312 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:50:55,512 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:50:55,512 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:50:55,512 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:50:55,512 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:50:55,513 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:50:55,515 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:50:55,515 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:50:55,515 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:50:55,515 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:50:55,516 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:50:55,518 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:50:55,519 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,519 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,519 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,519 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,520 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,520 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:50:55,520 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,520 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:50:55,520 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,520 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,520 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,520 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,521 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: 'Bboxes' object has no attribute 'ndim'
+2025-06-25 14:50:55,523 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 544, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 222, in __init__
+    self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 54, in __init__
+    bboxes = bboxes[None, :] if bboxes.ndim == 1 else bboxes
+                                ^^^^^^^^^^^
+AttributeError: 'Bboxes' object has no attribute 'ndim'
+
+2025-06-25 14:50:55,523 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:50:55,524 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,524 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:50:55,524 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,524 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,524 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,524 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,524 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:50:55,526 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,526 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:50:55,526 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,526 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,526 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,526 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,528 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:50:55,528 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:50:55,528 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,529 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:50:55,530 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,530 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,532 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:50:55,532 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:50:55,532 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,532 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,532 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,532 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:50:55,534 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:50:55,534 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,535 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,535 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,535 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,535 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:50:55,535 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,536 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,536 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,537 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,537 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,537 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:50:55,540 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,540 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:50:55,540 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,541 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,541 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:50:55,541 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,541 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,542 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,542 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,542 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,542 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:50:55,544 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:50:55,544 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:50:55,545 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:50:55,545 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:50:55,545 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:50:55,545 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:50:55,546 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:50:55,546 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:50:55,546 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:50:55,546 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:50:55,547 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:50:55,547 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:50:55,547 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:50:55,549 - data_loading_test - ERROR - 测试__getitem__方法时出错: 'Bboxes' object has no attribute 'ndim'
+2025-06-25 14:50:55,550 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 856, in _cat_labels
+    "instances": Instances.concatenate(instances, axis=0),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 544, in concatenate
+    return Instances(bboxes, segments, keypoints, bbox_format=instances_list[0].bbox_format,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 222, in __init__
+    self._bboxes = Bboxes(bboxes=bboxes, format=bbox_format)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 54, in __init__
+    bboxes = bboxes[None, :] if bboxes.ndim == 1 else bboxes
+                                ^^^^^^^^^^^
+AttributeError: 'Bboxes' object has no attribute 'ndim'
+
+2025-06-25 14:50:55,551 - data_loading_test - INFO - 测试完成
+2025-06-25 14:50:55,551 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:50:55,551 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:51:44,674 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:51:44,674 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:51:53,640 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:51:53,640 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:51:53,640 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:51:53,641 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:51:53,641 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:51:53,641 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:51:53,642 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:51:58,830 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:51:58,830 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:51:58,830 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:51:58,830 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:51:58,831 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:51:58,831 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:51:58,831 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:51:58,831 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:51:58,831 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:51:58,832 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:51:58,835 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:51:58,836 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,836 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,836 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,837 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,837 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,837 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:51:58,837 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,839 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:51:58,839 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,839 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,839 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,839 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,841 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: 'Instances' object has no attribute 'remove_zero_area_boxes'
+2025-06-25 14:51:58,842 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Instances' object has no attribute 'remove_zero_area_boxes'
+
+2025-06-25 14:51:58,842 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:51:58,843 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,843 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:51:58,843 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,843 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,843 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,843 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,843 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:51:58,843 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,844 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:51:58,844 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,844 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,844 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,844 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,844 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:51:58,845 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:51:58,845 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,845 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:51:58,845 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,846 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,848 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:51:58,848 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:51:58,849 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,849 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,850 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,850 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,852 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,852 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,852 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:51:58,852 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:51:58,852 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,852 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,852 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,853 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:51:58,853 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,854 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,854 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,854 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,854 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,855 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,858 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:51:58,859 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:51:58,859 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,859 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,859 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,859 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,859 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:51:58,860 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:51:58,860 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:51:58,860 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,861 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:51:58,861 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,861 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,861 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,861 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,861 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,861 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,861 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:51:58,862 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,862 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:51:58,862 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,863 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,863 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:51:58,863 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,863 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:51:58,864 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:51:58,864 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:51:58,864 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:51:58,865 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:51:58,865 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:51:58,866 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:51:58,866 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:51:58,866 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:51:58,866 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:51:58,867 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:51:58,867 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:51:58,868 - data_loading_test - ERROR - 测试__getitem__方法时出错: 'Instances' object has no attribute 'remove_zero_area_boxes'
+2025-06-25 14:51:58,869 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Instances' object has no attribute 'remove_zero_area_boxes'
+
+2025-06-25 14:51:58,870 - data_loading_test - INFO - 测试完成
+2025-06-25 14:51:58,870 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:51:58,870 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:54:52,117 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:54:52,118 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:54:58,499 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:54:58,499 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:54:58,499 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:54:58,499 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:54:58,499 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:54:58,500 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:54:58,500 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:55:03,744 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:55:03,744 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:55:03,744 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:55:03,744 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:55:03,745 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:55:03,746 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:55:03,746 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:55:03,746 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:55:03,748 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:55:03,748 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:55:03,748 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,748 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:55:03,749 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:55:03,749 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:55:03,749 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,751 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:55:03,751 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,751 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,751 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:55:03,751 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,751 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:55:03,751 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,751 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:55:03,752 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,752 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,754 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: '>' not supported between instances of 'method' and 'int'
+2025-06-25 14:55:03,755 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 481, in remove_zero_area_boxes
+    good = self.bbox_areas > 0
+           ^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'method' and 'int'
+
+2025-06-25 14:55:03,755 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:55:03,755 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,755 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:55:03,755 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,757 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:55:03,766 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,766 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,766 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:55:03,766 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,766 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:55:03,767 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,767 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:55:03,767 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,767 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,768 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:55:03,768 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:55:03,768 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,768 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:55:03,768 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,768 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:55:03,770 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,770 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:55:03,770 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 变换后 instances 存在，长度: 0
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 变换前 instances 存在，长度: 0
+2025-06-25 14:55:03,772 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:55:03,772 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,773 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,773 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,773 - data_loading_test - INFO - 输入instances长度: 0
+2025-06-25 14:55:03,773 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,773 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:55:03,774 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,774 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 变换后 instances 存在，长度: 0
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 变换前 instances 存在，长度: 0
+2025-06-25 14:55:03,775 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,775 - data_loading_test - INFO - 输入instances长度: 0
+2025-06-25 14:55:03,775 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,775 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:55:03,778 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,778 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 变换后 instances 存在，长度: 0
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 变换前 instances 存在，长度: 0
+2025-06-25 14:55:03,779 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,779 - data_loading_test - INFO - 输入instances长度: 0
+2025-06-25 14:55:03,780 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,780 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,780 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:55:03,780 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:55:03,780 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,780 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,780 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 变换后 instances 存在，长度: 0
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 变换前 instances 存在，长度: 0
+2025-06-25 14:55:03,781 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,781 - data_loading_test - INFO - 输入instances长度: 0
+2025-06-25 14:55:03,781 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,781 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,782 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:55:03,782 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:55:03,782 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,782 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,782 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 输出instances长度: 0
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 变换后 instances 存在，长度: 0
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 变换前 instances 存在，长度: 0
+2025-06-25 14:55:03,783 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:55:03,783 - data_loading_test - INFO - 输入instances长度: 0
+2025-06-25 14:55:03,784 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:55:03,784 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:55:03,784 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:55:03,785 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:55:03,785 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:55:03,785 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:55:03,785 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:55:03,785 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:55:03,785 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:55:03,785 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:55:03,785 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:55:03,786 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([0, 1])
+2025-06-25 14:55:03,786 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([0, 1])
+2025-06-25 14:55:03,786 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:55:03,787 - data_loading_test - ERROR - 测试__getitem__方法时出错: '>' not supported between instances of 'method' and 'int'
+2025-06-25 14:55:03,789 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 481, in remove_zero_area_boxes
+    good = self.bbox_areas > 0
+           ^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'method' and 'int'
+
+2025-06-25 14:55:03,789 - data_loading_test - INFO - 测试完成
+2025-06-25 14:55:03,789 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:55:03,790 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:57:58,463 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:57:58,464 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:58:05,150 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:58:05,151 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:58:05,151 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:58:05,151 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:58:05,151 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:58:05,151 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:58:05,152 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:58:10,367 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:58:10,367 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:58:10,367 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:58:10,368 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:58:10,368 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:58:10,370 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:58:10,370 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:58:10,370 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:58:10,370 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:58:10,370 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:58:10,371 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:58:10,374 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:58:10,374 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:58:10,376 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,376 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:58:10,376 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,377 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:58:10,377 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,377 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,377 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,377 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,378 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:58:10,378 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,378 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:58:10,379 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,381 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,382 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,382 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,384 - data_loading_test - ERROR - 应用变换 Mosaic 时出错: '>' not supported between instances of 'method' and 'int'
+2025-06-25 14:58:10,386 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 481, in remove_zero_area_boxes
+    good = self.bbox_areas > 0
+           ^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'method' and 'int'
+
+2025-06-25 14:58:10,386 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:58:10,387 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,387 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:58:10,387 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,387 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,387 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,387 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,387 - data_loading_test - INFO - ===== 进入 LetterBox =====
+2025-06-25 14:58:10,388 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,388 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels']
+2025-06-25 14:58:10,388 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,388 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,388 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,388 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,389 - data_loading_test - INFO - 变换 LetterBox 成功应用
+2025-06-25 14:58:10,389 - data_loading_test - INFO - ===== 离开 LetterBox =====
+2025-06-25 14:58:10,389 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,389 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances', 'mix_labels', 'resized_shape']
+2025-06-25 14:58:10,389 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,389 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 变换 RandomPerspective 成功应用
+2025-06-25 14:58:10,392 - data_loading_test - INFO - ===== 离开 RandomPerspective =====
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,392 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:58:10,393 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,393 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,393 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,393 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,395 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:58:10,395 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:58:10,395 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,395 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:58:10,396 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,396 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,396 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,396 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,396 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,396 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,399 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:58:10,400 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,400 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,400 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,400 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,400 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:58:10,401 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:58:10,401 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,402 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,402 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,402 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,403 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:58:10,403 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 输出标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:58:10,403 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:58:10,403 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:58:10,404 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:58:10,404 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'instances']
+2025-06-25 14:58:10,404 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:58:10,404 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:58:10,404 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:58:10,404 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:58:10,405 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:58:10,405 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:58:10,405 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'cluster_ids', 'h_rel', 'mix_labels', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx']
+2025-06-25 14:58:10,405 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:58:10,406 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:58:10,406 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:58:10,408 - data_loading_test - ERROR - 测试__getitem__方法时出错: '>' not supported between instances of 'method' and 'int'
+2025-06-25 14:58:10,410 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 405, in __call__
+    labels = self._mix_transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 596, in _mix_transform
+    self._mosaic3(labels) if self.n == 3 else self._mosaic4(labels) if self.n == 4 else self._mosaic9(labels)
+                                              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 712, in _mosaic4
+    final_labels = self._cat_labels(mosaic_labels)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 860, in _cat_labels
+    good = final_labels["instances"].remove_zero_area_boxes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\instance.py", line 481, in remove_zero_area_boxes
+    good = self.bbox_areas > 0
+           ^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'method' and 'int'
+
+2025-06-25 14:58:10,411 - data_loading_test - INFO - 测试完成
+2025-06-25 14:58:10,411 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:58:10,411 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 14:59:23,835 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 14:59:23,835 - data_loading_test - INFO - 当前目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:59:31,826 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 14:59:31,826 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 14:59:31,826 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 14:59:31,827 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 14:59:31,827 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 14:59:31,827 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 14:59:31,828 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 创建基本变换
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 创建预变换
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 14:59:37,149 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 组合所有变换
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 14:59:37,151 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 14:59:37,154 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 14:59:37,154 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,155 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,155 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,155 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,155 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,155 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,156 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,156 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,157 - data_loading_test - INFO - 变换 Mosaic 成功应用
+2025-06-25 14:59:37,157 - data_loading_test - INFO - ===== 离开 Mosaic =====
+2025-06-25 14:59:37,157 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输出instances长度: 50
+2025-06-25 14:59:37,158 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,158 - data_loading_test - INFO - 输入instances长度: 50
+2025-06-25 14:59:37,158 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,158 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,161 - data_loading_test - ERROR - 应用变换 RandomPerspective 时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 50
+2025-06-25 14:59:37,162 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 50
+
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 14:59:37,162 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 14:59:37,162 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,164 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,164 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,164 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 14:59:37,164 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,164 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,165 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,165 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,165 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,165 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,176 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 14:59:37,176 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 14:59:37,176 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,176 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,178 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,178 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,179 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,179 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,179 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,179 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 14:59:37,180 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,180 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,180 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,180 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,181 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 14:59:37,181 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 输出instances长度: 13
+2025-06-25 14:59:37,181 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 变换后 instances 存在，长度: 13
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 14:59:37,182 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 14:59:37,182 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 14:59:37,182 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 14:59:37,182 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 14:59:37,184 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 14:59:37,184 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 14:59:37,186 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 14:59:37,186 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 14:59:37,186 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 14:59:37,186 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 14:59:37,186 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 14:59:37,186 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 14:59:37,187 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 14:59:37,187 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([13, 1])
+2025-06-25 14:59:37,187 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([13, 1])
+2025-06-25 14:59:37,187 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 14:59:37,191 - data_loading_test - ERROR - 测试__getitem__方法时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 26
+2025-06-25 14:59:37,192 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 26
+
+2025-06-25 14:59:37,192 - data_loading_test - INFO - 测试完成
+2025-06-25 14:59:37,193 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 14:59:37,193 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 15:03:02,984 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 15:03:02,984 - data_loading_test - INFO - 当前目录: d:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 15:03:09,622 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 15:03:09,623 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 15:03:14,769 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 15:03:14,769 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 15:03:14,769 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 15:03:14,769 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 15:03:14,769 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建基本变换
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建预变换
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 15:03:14,770 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 15:03:14,771 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 15:03:14,771 - data_loading_test - INFO - 组合所有变换
+2025-06-25 15:03:14,771 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 15:03:14,771 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 15:03:14,771 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 15:03:14,775 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 15:03:14,775 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:03:14,775 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,776 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 15:03:14,776 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 15:03:14,776 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 15:03:14,776 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 15:03:14,776 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 15:03:14,776 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 15:03:14,777 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 15:03:14,777 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 15:03:14,777 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,777 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:03:14,778 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,778 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 15:03:14,778 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,778 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,778 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 15:03:14,778 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,778 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:03:14,778 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,779 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 15:03:14,779 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,779 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,780 - data_loading_test - INFO - 变换 Mosaic 成功应用
+2025-06-25 15:03:14,780 - data_loading_test - INFO - ===== 离开 Mosaic =====
+2025-06-25 15:03:14,782 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,782 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 15:03:14,782 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,782 - data_loading_test - INFO - 输出instances长度: 52
+2025-06-25 15:03:14,782 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 15:03:14,783 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,783 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 15:03:14,783 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,783 - data_loading_test - INFO - 输入instances长度: 52
+2025-06-25 15:03:14,783 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,783 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,785 - data_loading_test - ERROR - 应用变换 RandomPerspective 时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 52
+2025-06-25 15:03:14,786 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 52
+
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 15:03:14,787 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 15:03:14,787 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:03:14,788 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 15:03:14,788 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:03:14,788 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 15:03:14,788 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,788 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,788 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,789 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:03:14,789 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,789 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,790 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 15:03:14,790 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 15:03:14,790 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,790 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,792 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,792 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:03:14,792 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 15:03:14,792 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:03:14,793 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 15:03:14,793 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:03:14,793 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 15:03:14,793 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,793 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,793 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,794 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:03:14,794 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,794 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,803 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 15:03:14,804 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 15:03:14,804 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:03:14,804 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 15:03:14,805 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,805 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,805 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,805 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:03:14,805 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,805 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,805 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 15:03:14,808 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:03:14,808 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 15:03:14,809 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:03:14,809 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 15:03:14,809 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,809 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,809 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,809 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:03:14,809 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,811 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 15:03:14,811 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:03:14,811 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:03:14,811 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:03:14,812 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:03:14,812 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:03:14,812 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:03:14,812 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:03:14,815 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 15:03:14,815 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 15:03:14,815 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:03:14,816 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 15:03:14,816 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 15:03:14,816 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 15:03:14,816 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 15:03:14,816 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 15:03:14,816 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 15:03:14,816 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([10, 1])
+2025-06-25 15:03:14,818 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([10, 1])
+2025-06-25 15:03:14,818 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 15:03:14,820 - data_loading_test - ERROR - 测试__getitem__方法时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 52
+2025-06-25 15:03:14,823 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 52
+
+2025-06-25 15:03:14,823 - data_loading_test - INFO - 测试完成
+2025-06-25 15:03:14,823 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 15:03:14,823 - data_loading_test - INFO - 脚本执行结束
+2025-06-25 15:20:17,357 - data_loading_test - INFO - 脚本开始执行
+2025-06-25 15:20:17,357 - data_loading_test - INFO - 当前目录: d:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 15:20:24,931 - data_loading_test - INFO - 所有模块导入成功
+2025-06-25 15:20:24,932 - data_loading_test - INFO - 主函数开始执行
+2025-06-25 15:20:24,932 - data_loading_test - INFO - 开始测试番茄数据集加载过程
+2025-06-25 15:20:24,932 - data_loading_test - INFO - 当前工作目录: D:\yoloProject\yolo_new_local\yolo_my-0.1
+2025-06-25 15:20:24,932 - data_loading_test - INFO - 训练数据路径: D:/TomatoDataset\roboflow-v2/train/images
+2025-06-25 15:20:24,934 - data_loading_test - INFO - 超参数配置完成
+2025-06-25 15:20:24,934 - data_loading_test - INFO - 开始创建TomatoYOLODataset
+2025-06-25 15:20:30,010 - data_loading_test - INFO - 数据集创建成功，包含 3764 个样本
+2025-06-25 15:20:30,010 - data_loading_test - INFO - 检查数据集标签格式
+2025-06-25 15:20:30,010 - data_loading_test - INFO - 样本 0 标签类型: <class 'dict'>
+2025-06-25 15:20:30,011 - data_loading_test - INFO - 样本 0 标签键: ['im_file', 'shape', 'cls', 'bboxes', 'segments', 'keypoints', 'normalized', 'bbox_format', 'cluster_ids', 'h_rel']
+2025-06-25 15:20:30,011 - data_loading_test - INFO - 样本 0 cluster_ids 形状: (13, 1)
+2025-06-25 15:20:30,011 - data_loading_test - INFO - 样本 0 h_rel 形状: (13, 1)
+2025-06-25 15:20:30,012 - data_loading_test - INFO - 创建监控版的数据增强管道
+2025-06-25 15:20:30,012 - data_loading_test - INFO - 创建基本变换
+2025-06-25 15:20:30,012 - data_loading_test - INFO - 创建预变换
+2025-06-25 15:20:30,013 - data_loading_test - INFO - 创建MixUp变换
+2025-06-25 15:20:30,013 - data_loading_test - INFO - 创建HSV变换
+2025-06-25 15:20:30,014 - data_loading_test - INFO - 创建翻转变换
+2025-06-25 15:20:30,014 - data_loading_test - INFO - 创建格式化变换
+2025-06-25 15:20:30,014 - data_loading_test - INFO - 组合所有变换
+2025-06-25 15:20:30,014 - data_loading_test - INFO - 数据增强管道创建成功
+2025-06-25 15:20:30,014 - data_loading_test - INFO - 测试数据加载和增强
+2025-06-25 15:20:30,015 - data_loading_test - INFO - 获取样本 0 的原始标签
+2025-06-25 15:20:30,017 - data_loading_test - INFO - 原始标签类型: <class 'dict'>
+2025-06-25 15:20:30,017 - data_loading_test - INFO - 原始标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:20:30,017 - data_loading_test - INFO - 原始instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 原始instances长度: 13
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 原始instances.cluster_ids: False
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 原始instances.h_rel: False
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 开始应用数据增强变换
+2025-06-25 15:20:30,018 - data_loading_test - INFO - MonitoringCompose开始处理，共有 6 个变换
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 应用变换 0: TrackingTransform
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 变换前 instances 存在，长度: 13
+2025-06-25 15:20:30,018 - data_loading_test - INFO - ===== 进入 PreTransform =====
+2025-06-25 15:20:30,018 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 15:20:30,019 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,019 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,019 - data_loading_test - INFO - ===== 进入 Mosaic =====
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入标签键: ['im_file', 'cls', 'img', 'ori_shape', 'resized_shape', 'ratio_pad', 'cluster_ids', 'h_rel', 'instances']
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,019 - data_loading_test - INFO - 输入instances长度: 13
+2025-06-25 15:20:30,019 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,019 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,022 - data_loading_test - INFO - 变换 Mosaic 成功应用
+2025-06-25 15:20:30,022 - data_loading_test - INFO - ===== 离开 Mosaic =====
+2025-06-25 15:20:30,022 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,022 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 15:20:30,022 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,022 - data_loading_test - INFO - 输出instances长度: 26
+2025-06-25 15:20:30,023 - data_loading_test - INFO - ===== 进入 RandomPerspective =====
+2025-06-25 15:20:30,023 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,023 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'instances', 'mosaic_border', 'img']
+2025-06-25 15:20:30,023 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,024 - data_loading_test - INFO - 输入instances长度: 26
+2025-06-25 15:20:30,024 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,024 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,026 - data_loading_test - ERROR - 应用变换 RandomPerspective 时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 26
+2025-06-25 15:20:30,027 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 70, in __call__
+    result = self.transform(labels)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 26
+
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 变换 PreTransform 成功应用
+2025-06-25 15:20:30,027 - data_loading_test - INFO - ===== 离开 PreTransform =====
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:20:30,027 - data_loading_test - INFO - 变换 0 应用成功
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 应用变换 1: TrackingTransform
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:20:30,029 - data_loading_test - INFO - ===== 进入 MixUp =====
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,029 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:20:30,030 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,030 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,030 - data_loading_test - INFO - 变换 MixUp 成功应用
+2025-06-25 15:20:30,030 - data_loading_test - INFO - ===== 离开 MixUp =====
+2025-06-25 15:20:30,030 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,030 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,030 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,030 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 变换 1 应用成功
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 应用变换 2: TrackingTransform
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:20:30,031 - data_loading_test - INFO - ===== 进入 RandomHSV =====
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,031 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,032 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:20:30,032 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,032 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,041 - data_loading_test - INFO - 变换 RandomHSV 成功应用
+2025-06-25 15:20:30,044 - data_loading_test - INFO - ===== 离开 RandomHSV =====
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 变换 2 应用成功
+2025-06-25 15:20:30,044 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:20:30,045 - data_loading_test - INFO - 应用变换 3: TrackingTransform
+2025-06-25 15:20:30,045 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:20:30,045 - data_loading_test - INFO - ===== 进入 RandomFlipUD =====
+2025-06-25 15:20:30,045 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,045 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,046 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,046 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:20:30,046 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,046 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,046 - data_loading_test - INFO - 变换 RandomFlipUD 成功应用
+2025-06-25 15:20:30,046 - data_loading_test - INFO - ===== 离开 RandomFlipUD =====
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 变换 3 应用成功
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 应用变换 4: TrackingTransform
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:20:30,047 - data_loading_test - INFO - ===== 进入 RandomFlipLR =====
+2025-06-25 15:20:30,047 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,048 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,048 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,048 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:20:30,048 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,048 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,049 - data_loading_test - INFO - 变换 RandomFlipLR 成功应用
+2025-06-25 15:20:30,049 - data_loading_test - INFO - ===== 离开 RandomFlipLR =====
+2025-06-25 15:20:30,049 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,049 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,049 - data_loading_test - INFO - 输出instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 输出instances长度: 10
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 变换 4 应用成功
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 变换后 instances 存在，长度: 10
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 应用变换 5: TrackingTransform
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 变换前 instances 存在，长度: 10
+2025-06-25 15:20:30,050 - data_loading_test - INFO - ===== 进入 TomatoFormat =====
+2025-06-25 15:20:30,050 - data_loading_test - INFO - 输入标签类型: <class 'dict'>
+2025-06-25 15:20:30,051 - data_loading_test - INFO - 输入标签键: ['im_file', 'ori_shape', 'resized_shape', 'cls', 'img', 'instances']
+2025-06-25 15:20:30,051 - data_loading_test - INFO - 输入instances类型: <class 'ultralytics.utils.instance.Instances'>
+2025-06-25 15:20:30,051 - data_loading_test - INFO - 输入instances长度: 10
+2025-06-25 15:20:30,051 - data_loading_test - INFO - instances.cluster_ids: False
+2025-06-25 15:20:30,051 - data_loading_test - INFO - instances.h_rel: False
+2025-06-25 15:20:30,054 - data_loading_test - INFO - 变换 TomatoFormat 成功应用
+2025-06-25 15:20:30,054 - data_loading_test - INFO - ===== 离开 TomatoFormat =====
+2025-06-25 15:20:30,054 - data_loading_test - INFO - 输出标签类型: <class 'dict'>
+2025-06-25 15:20:30,054 - data_loading_test - INFO - 输出标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 15:20:30,054 - data_loading_test - WARNING - 输出标签中没有instances字段!
+2025-06-25 15:20:30,054 - data_loading_test - INFO - 变换 5 应用成功
+2025-06-25 15:20:30,054 - data_loading_test - WARNING - 变换后 instances 不存在!
+2025-06-25 15:20:30,055 - data_loading_test - INFO - 变换后标签类型: <class 'dict'>
+2025-06-25 15:20:30,055 - data_loading_test - INFO - 变换后标签键: ['im_file', 'ori_shape', 'resized_shape', 'img', 'cls', 'bboxes', 'batch_idx', 'cluster_ids', 'h_rel']
+2025-06-25 15:20:30,055 - data_loading_test - INFO - 变换后 cluster_ids 形状: torch.Size([10, 1])
+2025-06-25 15:20:30,055 - data_loading_test - INFO - 变换后 h_rel 形状: torch.Size([10, 1])
+2025-06-25 15:20:30,055 - data_loading_test - INFO - 测试__getitem__方法
+2025-06-25 15:20:30,058 - data_loading_test - ERROR - 测试__getitem__方法时出错: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 42
+2025-06-25 15:20:30,060 - data_loading_test - ERROR - Traceback (most recent call last):
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\test_data_loading.py", line 320, in test_dataset_loading
+    item = dataset[sample_idx]
+           ~~~~~~~^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\base.py", line 314, in __getitem__
+    return self.transforms(self.get_image_and_label(index))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 201, in __call__
+    data = t(data)
+           ^^^^^^^
+  File "d:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\data\augment.py", line 1264, in __call__
+    labels["cls"] = cls[i]
+                    ~~~^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 42
+
+2025-06-25 15:20:30,060 - data_loading_test - INFO - 测试完成
+2025-06-25 15:20:30,060 - data_loading_test - INFO - 主函数执行完成
+2025-06-25 15:20:30,061 - data_loading_test - INFO - 脚本执行结束

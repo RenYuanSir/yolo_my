@@ -1,0 +1,1 @@
+2025-06-26 14:40:35,214 - debug_loss - ERROR - µ¼ÈëYOLOÄ£¿éÊ§°Ü: cannot import name 'make_anchors' from 'ultralytics.utils.ops' (D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\utils\ops.py)

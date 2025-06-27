@@ -1,0 +1,17 @@
+# 番茄数据集配置
+path: D:/TomatoDataset/roboflow-v2  # 数据集根目录
+train: D:/TomatoDataset/roboflow-v2/train/images  # 训练集图像目录
+val: D:/TomatoDataset/roboflow-v2/valid/images  # 验证集图像目录
+test: D:/TomatoDataset/roboflow-v2/test/images  # 测试集图像目录
+
+# 类别信息
+nc: 6  # 类别数量
+names: ['fully ripe', 'ripe', 'turning', 'green', 'ripe bunch', 'unripe bunch']  # 类别名称
+
+# 特殊标志
+has_cluster_ids: True  # 启用串ID
+has_h_rel: True  # 启用相对高度
+
+# 其他配置
+single_cls: False  # 是否将所有类别视为单一类别
+rect: False  # 是否使用矩形训练 

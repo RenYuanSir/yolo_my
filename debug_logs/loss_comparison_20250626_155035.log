@@ -1,0 +1,49 @@
+2025-06-26 15:50:42,481 - loss_comparison - INFO - 成功导入YOLO模块
+2025-06-26 15:50:42,481 - loss_comparison - INFO - 开始比较损失计算效果...
+2025-06-26 15:50:42,481 - loss_comparison - INFO - 加载模型: D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics/cfg/models/v12/yolo12-A2C2f-DYT-EfficientHead-MambaOut.yaml
+2025-06-26 15:50:42,735 - loss_comparison - INFO - 模型加载成功
+2025-06-26 15:50:42,737 - loss_comparison - INFO - 原始损失函数已创建
+2025-06-26 15:50:42,744 - loss_comparison - INFO - 已创建样本批次: batch_size=2, num_objects=20, num_clusters=4
+2025-06-26 15:50:42,746 - tomato_fix - INFO - 正在修复TomatoDetectWithRankLoss...
+2025-06-26 15:50:42,748 - tomato_fix - INFO - 成功应用修复补丁!
+2025-06-26 15:50:42,748 - tomato_fix - INFO - 已修复问题:
+2025-06-26 15:50:42,748 - tomato_fix - INFO - 1. 改进了正样本分配策略 - 扩展GT框并调整分配器参数
+2025-06-26 15:50:42,748 - tomato_fix - INFO - 2. 修正了排序损失(rank_loss)计算 - 适配正确的高度和成熟度表示
+2025-06-26 15:50:42,748 - tomato_fix - INFO - 3. 增加了基于h_pos特征的排序损失计算
+2025-06-26 15:50:42,748 - loss_comparison - INFO - 补丁应用成功
+2025-06-26 15:50:42,749 - loss_comparison - INFO - 计算原始损失...
+2025-06-26 15:50:42,916 - loss_comparison - ERROR - 原始损失计算失败: tensors used as indices must be long, int, byte or bool tensors
+2025-06-26 15:50:42,917 - loss_comparison - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\debug_compare_losses.py", line 162, in calculate_loss
+    loss, loss_items = loss_fn(preds, batch)
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\tomato_model_fix_patch.py", line 293, in tomato_detection_with_rank_loss_call_fixed
+    valid_boxes = gt_bboxes[b, batch_valid_mask]
+                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+IndexError: tensors used as indices must be long, int, byte or bool tensors
+
+2025-06-26 15:50:42,917 - loss_comparison - INFO - 计算修复后的损失...
+2025-06-26 15:50:43,035 - loss_comparison - ERROR - 修复后损失计算失败: tensors used as indices must be long, int, byte or bool tensors
+2025-06-26 15:50:43,035 - loss_comparison - ERROR - Traceback (most recent call last):
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\debug_compare_losses.py", line 162, in calculate_loss
+    loss, loss_items = loss_fn(preds, batch)
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\yoloProject\yolo_new_local\yolo_my-0.1\tomato_model_fix_patch.py", line 293, in tomato_detection_with_rank_loss_call_fixed
+    valid_boxes = gt_bboxes[b, batch_valid_mask]
+                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+IndexError: tensors used as indices must be long, int, byte or bool tensors
+
+2025-06-26 15:50:43,035 - loss_comparison - INFO - 
+================================================================================
+2025-06-26 15:50:43,037 - loss_comparison - INFO - 损失比较:
+2025-06-26 15:50:43,037 - loss_comparison - INFO - ----------------------------------------
+2025-06-26 15:50:43,037 - loss_comparison - INFO - 项目             原始损失           修复后损失          是否改进      
+2025-06-26 15:50:43,037 - loss_comparison - INFO - ------------------------------------------------------------
+2025-06-26 15:50:43,037 - loss_comparison - INFO - total_loss     nan            nan            ?         
+2025-06-26 15:50:43,037 - loss_comparison - INFO - box_loss       nan            nan            ?         
+2025-06-26 15:50:43,037 - loss_comparison - INFO - cls_loss       nan            nan            ?         
+2025-06-26 15:50:43,037 - loss_comparison - INFO - dfl_loss       nan            nan            ?         
+2025-06-26 15:50:43,037 - loss_comparison - INFO - rank_loss      nan            nan            ?         
+2025-06-26 15:50:43,037 - loss_comparison - INFO - ================================================================================
+2025-06-26 15:50:43,037 - loss_comparison - WARNING - 两种损失都无效，无法生成可视化
+2025-06-26 15:50:43,038 - loss_comparison - INFO - 损失比较完成
