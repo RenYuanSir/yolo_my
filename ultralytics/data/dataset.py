@@ -607,7 +607,16 @@ class TomatoYOLODataset(YOLODataset):
                     cy = (y1 + y2) / 2  # 中心点y坐标
                     w = x2 - x1         # 宽度
                     h = y2 - y1         # 高度
-                    
+
+                    # 检查并修正异常宽度和高度
+                    w_clamped = np.clip(w, 1e-6, None)
+                    h_clamped = np.clip(h, 1e-6, None)
+                    if np.any(w != w_clamped) or np.any(h != h_clamped):
+                        LOGGER.warning(
+                            "TomatoYOLODataset.update_labels_info: Detected non-positive width/height when converting from XYXY; clamped to epsilon"
+                        )
+                    w, h = w_clamped, h_clamped
+
                     # 重组并更新边界框
                     bboxes = np.stack([cx, cy, w, h], axis=1)
                     LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 转换为XYWH格式: {bboxes.shape}")
@@ -618,6 +627,14 @@ class TomatoYOLODataset(YOLODataset):
                     bboxes[:, 1] /= img_h  # 归一化中心点y
                     bboxes[:, 2] /= img_w  # 归一化宽度
                     bboxes[:, 3] /= img_h  # 归一化高度
+                    w_clamped = np.clip(bboxes[:, 2], 1e-6, None)
+                    h_clamped = np.clip(bboxes[:, 3], 1e-6, None)
+                    if np.any(bboxes[:, 2] != w_clamped) or np.any(bboxes[:, 3] != h_clamped):
+                        LOGGER.warning(
+                            "TomatoYOLODataset.update_labels_info: Detected non-positive width/height during normalization; clamped to epsilon"
+                        )
+                    bboxes[:, 2] = w_clamped
+                    bboxes[:, 3] = h_clamped
                 
                 # 更新标签中的边界框
                 label["bboxes"] = bboxes
