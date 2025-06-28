@@ -1434,52 +1434,46 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
 
 
             
-    def compute_ranking_loss(self, batch, pred_scores=None):
-        """
-        计算番茄串内成熟度排序损失
-        
-        基于观察：同一串内，位置更高的番茄成熟度更高
-        
+    def compute_ranking_loss(self, batch, h_pos=None):
+        """Compute ordering loss using predicted height features.
+
         Args:
-            batch: 数据批次，包含：
-                - batch["cluster_ids"]: 串ID标签
-                - batch["h_rel"]: 相对高度标签
-                - batch["cls"]: 类别标签
-            pred_scores: 预测的类别得分，用于可能的未来扩展
-        
+            batch (dict): Must contain ``cluster_ids`` and ``cls`` tensors.
+            h_pos (Tensor | List[Tensor], optional): Predicted height features
+                corresponding to each instance.
+
         Returns:
-            rank_loss: 排序损失值
+            Tensor: Ranking loss value.
         """
-        # 设置一个最小排序损失，确保即使所有样本对都符合规则，也返回一个小的正值
-        MIN_RANK_LOSS = 0.01
         
-        # 检查是否有必要的数据
-        if "cluster_ids" not in batch or "h_rel" not in batch or "cls" not in batch:
-            # LOGGER.warning("排序损失: 批次中缺少必要的字段")
-            return torch.tensor(MIN_RANK_LOSS, device=self.device)
+        # 基本字段检查
+        if "cluster_ids" not in batch or "cls" not in batch:
+            return torch.tensor(0.0, device=self.device)
             
-        if batch["cluster_ids"] is None or batch["h_rel"] is None or batch["cls"] is None:
-            # LOGGER.warning("排序损失: 批次中有字段为None")
-            return torch.tensor(MIN_RANK_LOSS, device=self.device)
+        if batch["cluster_ids"] is None or batch["cls"] is None:
+            return torch.tensor(0.0, device=self.device)
             
-        if batch["cluster_ids"].numel() == 0 or batch["h_rel"].numel() == 0 or batch["cls"].numel() == 0:
-            # LOGGER.warning("排序损失: 批次中有空字段")
-            return torch.tensor(MIN_RANK_LOSS, device=self.device)
+        if batch["cluster_ids"].numel() == 0 or batch["cls"].numel() == 0:
+            return torch.tensor(0.0, device=self.device)
             
         # 准备数据
-        cluster_ids = batch["cluster_ids"].flatten()  # 展平为一维
-        h_rel = batch["h_rel"].flatten()  # 展平为一维
-        classes = batch["cls"]  # 类别
+        cluster_ids = batch["cluster_ids"].flatten()
+        classes = batch["cls"].flatten()
+        pred_h = None
+        if h_pos is not None:
+            pred_h = torch.cat([p.view(-1) for p in h_pos], 0) if isinstance(h_pos, list) else h_pos.view(-1)
+        if pred_h is None or pred_h.numel() < cluster_ids.numel():
+            dummy = pred_h.sum() * 0 if pred_h is not None else torch.tensor(0.0, device=self.device)
+            return dummy
         
         # 检查并过滤无效数据
-        valid_mask = (cluster_ids >= 0) & (h_rel >= 0) & (h_rel <= 1)
+        valid_mask = (cluster_ids >= 0) & (classes < self.FRUIT_CLASSES)
         if valid_mask.sum() == 0:
-            # LOGGER.warning("排序损失: 没有有效的数据")
-            return torch.tensor(MIN_RANK_LOSS, device=self.device)
+            return pred_h.sum() * 0
             
         # 应用过滤
         valid_cluster_ids = cluster_ids[valid_mask]
-        valid_h_rel = h_rel[valid_mask]
+        valid_h = pred_h[valid_mask]
         valid_classes = classes[valid_mask]
             
         # 获取所有唯一的串ID
@@ -1492,58 +1486,47 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
         
         # 对每个串内的番茄进行排序比较
         for cluster_id in unique_clusters:
-            # 跳过ID小于0的串（通常是背景或无效串）
             if cluster_id < 0:
-                    continue
-                    
-            # 找到当前串的所有番茄
+                continue
+
             cluster_mask = valid_cluster_ids == cluster_id
-            cluster_h_rel = valid_h_rel[cluster_mask]
+            cluster_h = valid_h[cluster_mask]
             cluster_classes = valid_classes[cluster_mask]
-            
-            n_tomatoes = len(cluster_h_rel)
+
+            n_tomatoes = len(cluster_h)
             if n_tomatoes <= 1:
                 continue  # 跳过只有一个番茄的串
-                
+
             # 比较同一串内的所有番茄对
             for i in range(n_tomatoes):
                 for j in range(i + 1, n_tomatoes):
-                    h1, h2 = cluster_h_rel[i], cluster_h_rel[j]
+                    h1, h2 = cluster_h[i], cluster_h[j]
                     cls1, cls2 = cluster_classes[i], cluster_classes[j]
                     
-                    # 计算高度差异
                     h_diff = torch.abs(h1 - h2)
-                    
-                    # 如果高度差异显著（大于阈值）
+
                     if h_diff > self.margin:
-                            pair_count += 1
-            
-                        # 确定预期的排序关系
-                    higher_tomato, lower_tomato = (i, j) if h1 < h2 else (j, i)
-                    higher_cls = cluster_classes[higher_tomato]
-                    lower_cls = cluster_classes[lower_tomato]
-                        
-                        # 如果类别差异与高度差异不符，增加损失
-                        # 假设数字越小表示越成熟（在同一类别组内）
-                    if higher_cls < lower_cls:
-                            # 成熟度排序与高度排序一致，符合预期
-                            pass
-                    else:
-                            # 成熟度排序与高度排序不一致，应该惩罚
-                            # 计算间隔损失：max(0, margin - |cls1 - cls2|)
-                            cls_diff = torch.abs(higher_cls - lower_cls).float()
-                            loss = torch.nn.functional.relu(self.margin - h_diff)
+                        pair_count += 1
+
+                        higher_idx, lower_idx = (i, j) if h1 < h2 else (j, i)
+                        higher_cls = cluster_classes[higher_idx]
+                        lower_cls = cluster_classes[lower_idx]
+
+                        if higher_cls > lower_cls:
+                            loss = F.margin_ranking_loss(
+                                h2.unsqueeze(0), h1.unsqueeze(0),
+                                torch.ones(1, device=self.device), margin=self.margin
+                            ) if h1 < h2 else F.margin_ranking_loss(
+                                h1.unsqueeze(0), h2.unsqueeze(0),
+                                torch.ones(1, device=self.device), margin=self.margin
+                            )
                             rank_loss += loss
                             penalty_count += 1
         
-        # 如果有采样对，计算平均损失；否则使用最小损失
-            if pair_count > 0:
-                rank_loss = rank_loss / pair_count
-                # 确保损失不为零
-                rank_loss = torch.max(rank_loss, torch.tensor(MIN_RANK_LOSS, device=self.device))
-                LOGGER.info(f"排序损失: 总共检查了 {pair_count} 对样本，有 {pair_count - penalty_count} 对产生了常规损失，有 {penalty_count} 对产生了额外惩罚")
-            else:
-                # LOGGER.info("排序损失: 没有有效的样本对，返回最小排序损失")
-                rank_loss = torch.tensor(MIN_RANK_LOSS, device=self.device)
-            
+        # 统计并归一化
+        if pair_count > 0:
+            rank_loss = rank_loss / pair_count
+        else:
+            rank_loss = pred_h.sum() * 0
+
         return rank_loss
