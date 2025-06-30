@@ -1140,6 +1140,10 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
             
         # 从特征中提取预测分布和分数
         pred_distri, pred_scores = self._extract_predictions(feats)
+        pred_h_pos_tensor = None
+        if pred_h_pos is not None and len(pred_h_pos) > 0:
+            pred_h_cat = torch.cat([p.view(p.shape[0], 1, -1) for p in pred_h_pos], dim=2)
+            pred_h_pos_tensor = pred_h_cat.permute(0, 2, 1).contiguous()
         
         # 获取批次大小和图像大小
         batch_size = pred_scores.shape[0]
@@ -1180,12 +1184,50 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
         # 将预测边界框形式转换为XYXY格式
         # 正确方式：先解码DFL，再传入dist2bbox
         pred_ltrb = self.decode_dfl(pred_distri)  # [B, N, 4]
-        pred_bboxes = dist2bbox(pred_ltrb, anchor_points * stride_tensor.unsqueeze(0), xywh=False)  # [B, N, 4]
+        grid_pred_bboxes = dist2bbox(pred_ltrb, anchor_points, xywh=False)
+        pred_bboxes = grid_pred_bboxes * stride_tensor.unsqueeze(0)  # [B, N, 4]
 
 
-        print("🧪 pred_bboxes: ", pred_bboxes.shape)  # [bs, num_anchors, 4]
-        print("pred_bboxes sample:", pred_bboxes[0, :5])  # 查看前5个预测框
-        print("    x range: [{:.4f}, {:.4f}]".format(pred_bboxes.min().item(), pred_bboxes.max().item()))
+        # =================== FINAL ASSIGNER CHECK ===================
+        print("\n" + "="*60)
+        print("🕵️  FINAL CHECK: Inputs to the Assigner")
+        print("-" * 60)
+
+        print("--- Prediction Scores (pred_scores.sigmoid()) ---")
+        scores_for_assigner = pred_scores.detach().sigmoid()
+        print(f"    Shape: {scores_for_assigner.shape}")
+        print(f"    Value Range: [{scores_for_assigner.min().item():.6f}, {scores_for_assigner.max().item():.6f}]")
+        print(f"    Mean value: {scores_for_assigner.mean().item():.6f}\n")
+
+        # 1. Check the Ground Truth boxes
+        print("--- Ground Truth Boxes (gt_bboxes) ---")
+        if gt_bboxes.numel() > 0:
+            print(f"    Shape: {gt_bboxes.shape}")
+            print(f"    dtype: {gt_bboxes.dtype}")
+            # Use a mask to get a sample of a non-zero box if one exists
+            non_zero_mask = gt_bboxes.sum(dim=-1).abs() > 0
+            if non_zero_mask.any():
+                print(f"    Value Range: [{gt_bboxes[non_zero_mask].min().item():.2f}, {gt_bboxes[non_zero_mask].max().item():.2f}]")
+                print(f"    Sample (first non-zero): {gt_bboxes[non_zero_mask][0]}")
+            else:
+                print("    WARNING: All gt_bboxes are zero.")
+        else:
+            print("    gt_bboxes is empty.")
+
+        # 2. Check the Predicted boxes
+        print("\n--- Predicted Boxes (pred_bboxes) ---")
+        if pred_bboxes.numel() > 0:
+            # Flatten the batch and anchor dimensions for easier inspection
+            pred_bboxes_flat = pred_bboxes.detach().view(-1, 4)
+            print(f"    Shape: {pred_bboxes.shape}")
+            print(f"    dtype: {pred_bboxes.dtype}")
+            print(f"    Value Range: [{pred_bboxes_flat.min().item():.2f}, {pred_bboxes_flat.max().item():.2f}]")
+            # Print a few samples from the first image in the batch
+            print(f"    Sample from first image:\n{pred_bboxes.detach()[0, :3, :]}")
+        else:
+            print("    pred_bboxes is empty.")
+        print("="*60 + "\n")
+        # ==========================================================
         
 
         # 分配正样本
@@ -1198,12 +1240,6 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
                 gt_bboxes,
                 mask_gt
             )
-        print(f"🟡 正样本数量: {fg_mask.sum()} / {fg_mask.numel()}")
-        print(f"🟡 target_scores sum: {target_scores.sum()}")
-        print(f"🟡 target_bboxes shape: {target_bboxes.shape}")
-        print(f"🟡 target_bboxes sample: {target_bboxes[0, :5]}")
-
-
 
         # 计算损失
         if target_bboxes.shape[-1] == 4 and stride_tensor is not None:
@@ -1216,8 +1252,6 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
                 target_bboxes[..., 0:2] /= stride_tensor_exp
                 target_bboxes[..., 2:4] /= stride_tensor_exp
             # 计算边界框损失
-        print("🎯 aligned target_bboxes sample:", target_bboxes[0, :5])
-        print("🎯 pred_bboxes sample:", pred_bboxes[0, :5])
 
         loss_bbox, loss_dfl = self.bbox_loss(
             pred_distri, pred_bboxes, anchor_points, target_bboxes, target_scores, target_gt_idx, fg_mask, stride_tensor
@@ -1243,10 +1277,30 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
             import traceback
             LOGGER.error(traceback.format_exc())
             loss_cls = torch.tensor(1.0, device=self.device, requires_grad=True)
-        
+        # ===================  DEBUG CHECK ===================
+        print("\n" + "="*60)
+        print("🕵️  CHECKING VARIABLE passed to compute_ranking_loss")
+
+        # Replace `pred_h_pos_tensor` with the actual name of the variable you are passing
+        variable_to_check = pred_h_pos_tensor 
+
+        print(f"    Variable name: pred_h_pos_tensor")
+        print(f"    TYPE of this variable: {type(variable_to_check)}")
+
+        if isinstance(variable_to_check, torch.Tensor):
+            print(f"    ✅ It's a TENSOR with shape: {variable_to_check.shape}")
+        elif isinstance(variable_to_check, dict):
+            print(f"    ❌ It's a DICTIONARY with keys: {list(variable_to_check.keys())}")
+            print(f"    THIS IS THE CAUSE OF THE KeyError!")
+        elif isinstance(variable_to_check, list):
+            print(f"    ❌ It's a LIST of length: {len(variable_to_check)}")
+            print(f"    THIS IS THE CAUSE OF THE TypeError!")
+
+        print("="*60 + "\n")
+        # ==========================================================
         # 计算排序损失
         try:
-            loss_rank = self.compute_ranking_loss(batch, pred_h_pos) * self.lambda_rank
+            loss_rank = self.compute_ranking_loss(pred_h_pos_tensor, batch, fg_mask, target_gt_idx) * self.lambda_rank
         except Exception as e:
             LOGGER.error(f"计算排序损失时出错: {e}")
             import traceback
@@ -1434,99 +1488,86 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
 
 
             
-    def compute_ranking_loss(self, batch, h_pos=None):
-        """Compute ordering loss using predicted height features.
-
-        Args:
-            batch (dict): Must contain ``cluster_ids`` and ``cls`` tensors.
-            h_pos (Tensor | List[Tensor], optional): Predicted height features
-                corresponding to each instance.
-
-        Returns:
-            Tensor: Ranking loss value.
+    def compute_ranking_loss(self, pred_h, batch, fg_mask, target_gt_idx):
         """
-        
-        # 基本字段检查
-        if "cluster_ids" not in batch or "cls" not in batch:
+        Computes ranking loss using a vectorized approach to prevent hanging.
+        """
+        # --- DEFINITIVE DEBUG CHECK ---
+        print("\n" + "="*60)
+        print("🕵️  CHECKING VARIABLE RECEIVED BY compute_ranking_loss")
+        print(f"    The type of the `pred_h` argument is: {type(pred_h)}")
+        if isinstance(pred_h, dict):
+            print(f"    >>> It IS A DICTIONARY! Keys: {list(pred_h.keys())}")
+            print(f"    >>> THIS IS THE CAUSE of the KeyError.")
+        elif isinstance(pred_h, torch.Tensor):
+            print(f"    >>> It is a TENSOR, as expected. Shape: {pred_h.shape}")
+        print("="*60 + "\n")
+        # --- END DEBUG CHECK ---
+        if fg_mask.sum() == 0:
             return torch.tensor(0.0, device=self.device)
-            
-        if batch["cluster_ids"] is None or batch["cls"] is None:
-            return torch.tensor(0.0, device=self.device)
-            
-        if batch["cluster_ids"].numel() == 0 or batch["cls"].numel() == 0:
-            return torch.tensor(0.0, device=self.device)
-            
-        # 准备数据
-        cluster_ids = batch["cluster_ids"].flatten()
-        classes = batch["cls"].flatten()
-        pred_h = None
-        if h_pos is not None:
-            pred_h = torch.cat([p.view(-1) for p in h_pos], 0) if isinstance(h_pos, list) else h_pos.view(-1)
-        if pred_h is None or pred_h.numel() < cluster_ids.numel():
-            dummy = pred_h.sum() * 0 if pred_h is not None else torch.tensor(0.0, device=self.device)
-            return dummy
+
+        # Get aligned predictions and ground truths for positive anchors
+        positive_pred_h = pred_h[fg_mask] # Shape: [num_pos]
+        gt_indices = target_gt_idx[fg_mask]
+        gt_cluster_ids = batch['cluster_ids'].flatten().to(self.device)[gt_indices]
+        gt_h_rel = batch['h_rel'].flatten().to(self.device)[gt_indices]
+        gt_classes = batch['cls'].flatten().to(self.device)[gt_indices]
         
-        # 检查并过滤无效数据
-        valid_mask = (cluster_ids >= 0) & (classes < self.FRUIT_CLASSES)
-        if valid_mask.sum() == 0:
-            return pred_h.sum() * 0
-            
-        # 应用过滤
-        valid_cluster_ids = cluster_ids[valid_mask]
-        valid_h = pred_h[valid_mask]
-        valid_classes = classes[valid_mask]
-            
-        # 获取所有唯一的串ID
-        unique_clusters = valid_cluster_ids.unique()
-        
-        # 初始化损失
-        rank_loss = torch.tensor(0.0, device=self.device)
-        pair_count = 0
-        penalty_count = 0
-        
-        # 对每个串内的番茄进行排序比较
+        unique_clusters = torch.unique(gt_cluster_ids)
+        final_loss = torch.tensor(0.0, device=self.device)
+        total_pairs = 0
+
         for cluster_id in unique_clusters:
             if cluster_id < 0:
                 continue
+            
+            # Find all items belonging to the current cluster
+            cluster_mask = gt_cluster_ids == cluster_id
+            n_tomatoes = cluster_mask.sum()
 
-            cluster_mask = valid_cluster_ids == cluster_id
-            cluster_h = valid_h[cluster_mask]
-            cluster_classes = valid_classes[cluster_mask]
+            if n_tomatoes < 2:
+                continue
+                
+            # Get the data for the current cluster
+            cluster_pred_h = positive_pred_h[cluster_mask]
+            cluster_gt_h = gt_h_rel[cluster_mask]
+            cluster_classes = gt_classes[cluster_mask]
+            
+            # --- VECTORIZED PAIR GENERATION ---
+            # Create all unique pairs of indices, e.g., (0,1), (0,2), (1,2)...
+            indices = torch.arange(n_tomatoes, device=self.device)
+            p1_idx, p2_idx = torch.combinations(indices, r=2).unbind(1)
+            
+            # Gather data for all pairs at once
+            h_pred1, h_pred2 = cluster_pred_h[p1_idx].squeeze(-1), cluster_pred_h[p2_idx].squeeze(-1)
+            h_gt1, h_gt2 = cluster_gt_h[p1_idx], cluster_gt_h[p2_idx]
+            cls1, cls2 = cluster_classes[p1_idx], cluster_classes[p2_idx]
 
-            n_tomatoes = len(cluster_h)
-            if n_tomatoes <= 1:
-                continue  # 跳过只有一个番茄的串
+            # --- VECTORIZED LOSS CALCULATION ---
+            # Create a target tensor: 1 if h_gt1 < h_gt2, -1 if h_gt2 < h_gt1, 0 otherwise
+            target = torch.sign(h_gt2 - h_gt1)
 
-            # 比较同一串内的所有番茄对
-            for i in range(n_tomatoes):
-                for j in range(i + 1, n_tomatoes):
-                    h1, h2 = cluster_h[i], cluster_h[j]
-                    cls1, cls2 = cluster_classes[i], cluster_classes[j]
-                    
-                    h_diff = torch.abs(h1 - h2)
+            # Calculate base ranking loss for all pairs at once
+            # margin_ranking_loss wants to make pred1 > pred2 for target=1
+            loss = F.margin_ranking_loss(h_pred1, h_pred2, target, margin=self.margin, reduction='none')
+            
+            # --- VECTORIZED HEAVY PENALTY ---
+            # Create masks for the special penalty condition
+            # Condition 1: model wrongly predicts h1 lower (h_pred1 >= h_pred2) AND GT is h_gt1 < h_gt2 AND classes match
+            penalty_mask1 = (h_pred1 >= h_pred2) & (target == 1) & (cls1 == 0) & (cls2 == 1)
+            # Condition 2: model wrongly predicts h2 lower (h_pred2 >= h_pred1) AND GT is h_gt2 < h_gt1 AND classes match
+            penalty_mask2 = (h_pred2 >= h_pred1) & (target == -1) & (cls2 == 0) & (cls1 == 1)
+            
+            # Create penalty multipliers (2.0 where condition is met, 1.0 otherwise)
+            penalty_factor = torch.ones_like(loss)
+            penalty_factor[penalty_mask1 | penalty_mask2] = 2.0 # Use heavy_penalty_factor from __init__ if you prefer
+            
+            # Apply penalty and sum up the loss for this cluster
+            final_loss += (loss * penalty_factor).sum()
+            total_pairs += len(p1_idx)
 
-                    if h_diff > self.margin:
-                        pair_count += 1
-
-                        higher_idx, lower_idx = (i, j) if h1 < h2 else (j, i)
-                        higher_cls = cluster_classes[higher_idx]
-                        lower_cls = cluster_classes[lower_idx]
-
-                        if higher_cls > lower_cls:
-                            loss = F.margin_ranking_loss(
-                                h2.unsqueeze(0), h1.unsqueeze(0),
-                                torch.ones(1, device=self.device), margin=self.margin
-                            ) if h1 < h2 else F.margin_ranking_loss(
-                                h1.unsqueeze(0), h2.unsqueeze(0),
-                                torch.ones(1, device=self.device), margin=self.margin
-                            )
-                            rank_loss += loss
-                            penalty_count += 1
-        
-        # 统计并归一化
-        if pair_count > 0:
-            rank_loss = rank_loss / pair_count
-        else:
-            rank_loss = pred_h.sum() * 0
-
-        return rank_loss
+        # Normalize the total loss
+        if total_pairs > 0:
+            return final_loss / total_pairs
+            
+        return torch.tensor(0.0, device=self.device)

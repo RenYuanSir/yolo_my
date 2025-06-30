@@ -137,7 +137,7 @@ if __name__ == '__main__':
             model.train(data=r"D:\TomatoDataset\roboflow-v2\data.yaml",
                     imgsz=640,
                     epochs=1,  # 只训练一个epoch用于测试
-                    batch=16,   # 使用更小的batch以降低资源需求
+                    batch=8,   # 使用更小的batch以降低资源需求
                     workers=0,  # 减少worker数量，避免多线程问题
                     device=[0,],
                     optimizer='SGD',
