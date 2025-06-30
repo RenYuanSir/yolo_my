@@ -774,37 +774,66 @@ class TomatoYOLODataset(YOLODataset):
                         LOGGER.error(f"TomatoYOLODataset.collate_fn: 修复后连接{k}仍然失败: {e2}")
                         # 失败则使用空张量
                         value = torch.zeros((0, 1), dtype=torch.float32)
-            elif k in {"cluster_ids", "h_rel"}:
-                # 番茄特有字段处理
+            elif k == "cluster_ids":
+                # 番茄串ID需要在批次内保持唯一，逐图像累加偏移
                 try:
-                    # 确保所有元素都是PyTorch张量
                     tensors = []
+                    offset = 0
                     for v in value:
                         if v is None:
-                            # 如果是None，创建空张量
                             v = torch.zeros((0, 1), dtype=torch.float32)
                         elif isinstance(v, np.ndarray):
                             v = torch.from_numpy(v)
                         elif not isinstance(v, torch.Tensor):
-                            # 尝试直接转换
                             try:
                                 v = torch.tensor(v, dtype=torch.float32)
                             except Exception as e:
                                 LOGGER.warning(f"TomatoYOLODataset.collate_fn: 转换{k}失败: {e}，使用空张量")
                                 v = torch.zeros((0, 1), dtype=torch.float32)
-                        
-                        # 确保形状正确
+
                         if v.ndim == 1:
                             v = v.reshape(-1, 1)
-                            
+
+                        if v.numel():
+                            mask = v >= 0
+                            if mask.any():
+                                v = v.clone()
+                                v[mask] += offset
+                                offset += int(v[mask].max().item()) + 1
                         tensors.append(v)
-                        
-                    # 连接张量
+
+                    value = torch.cat(tensors, 0)
+                    LOGGER.debug(
+                        f"TomatoYOLODataset.collate_fn: 成功连接{k}，形状={value.shape}, 最终偏移={offset}"
+                    )
+                except Exception as e:
+                    LOGGER.error(f"TomatoYOLODataset.collate_fn: 处理{k}时发生错误: {e}")
+                    value = torch.zeros((0, 1), dtype=torch.float32)
+            elif k == "h_rel":
+                # h_rel字段直接连接
+                try:
+                    tensors = []
+                    for v in value:
+                        if v is None:
+                            v = torch.zeros((0, 1), dtype=torch.float32)
+                        elif isinstance(v, np.ndarray):
+                            v = torch.from_numpy(v)
+                        elif not isinstance(v, torch.Tensor):
+                            try:
+                                v = torch.tensor(v, dtype=torch.float32)
+                            except Exception as e:
+                                LOGGER.warning(f"TomatoYOLODataset.collate_fn: 转换{k}失败: {e}，使用空张量")
+                                v = torch.zeros((0, 1), dtype=torch.float32)
+
+                        if v.ndim == 1:
+                            v = v.reshape(-1, 1)
+
+                        tensors.append(v)
+
                     value = torch.cat(tensors, 0)
                     LOGGER.debug(f"TomatoYOLODataset.collate_fn: 成功连接{k}，形状={value.shape}")
                 except Exception as e:
                     LOGGER.error(f"TomatoYOLODataset.collate_fn: 处理{k}时发生错误: {e}")
-                    # 出错时使用空张量
                     value = torch.zeros((0, 1), dtype=torch.float32)
             
             # 将处理后的值添加到新批次
