@@ -682,7 +682,6 @@ class Detect_Efficient_Tomato(Detect_Efficient):
     def __init__(self, nc=80, ch=()):  # detection layer
         super().__init__(nc, ch)
         # 不再修改self.no，保持与父类一致的通道数
-        # self.no = nc + self.reg_max * 4 + 1  # 删除这行，不再+1
         # 添加h_rel的预测头作为独立分支
         self.cv_h_pos = nn.ModuleList(nn.Conv2d(x, 1, 1) for x in ch)  # 1×1 conv for h_rel
 

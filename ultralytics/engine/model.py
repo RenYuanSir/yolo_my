@@ -628,7 +628,7 @@ class Model(nn.Module):
             Model summary: 168 layers, 3151904 parameters, 0 gradients
             Validate...
             [2023-10-1 13:12:07] val: data=/home/username/ultralytics/yolo/assets/coco8.yaml, imgsz=640, batch=1, device=cpu, half=False, dnn=False, plots=False
-            Class     Images  Instances          P          R      mAP50   mAP50-95
+            Class     Images  Instances       ，   P          R      mAP50   mAP50-95
             all           8         15      0.746      0.602      0.664      0.442
         """
         self._check_is_pytorch_model()

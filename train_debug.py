@@ -115,7 +115,7 @@ if __name__ == '__main__':
             logger.info(f"CUDA设备: {torch.cuda.get_device_name(0)}")
         
         logger.info("初始化YOLO模型")
-        model = YOLO(model=r'D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\cfg\models\v12\yolo12-A2C2f-DYT-EfficientHead-MambaOut.yaml')
+        model = YOLO(model=r'D:\yoloProject\yolo_new_local\yolo_my-0.1\ultralytics\cfg\models\v12\yolov12.yaml')
         
         # 极简训练选项
         logger.info("开始训练")
@@ -134,19 +134,20 @@ if __name__ == '__main__':
             callbacks.on_train_batch_start = on_train_batch_start
                 
             # 训练
-            model.train(data=r"D:\TomatoDataset\roboflow-v2\data.yaml",
+            model.train(data=r"D:\TomatoDataset\v2-test_mini\data.yaml",
                     imgsz=640,
-                    epochs=1,  # 只训练一个epoch用于测试
-                    batch=8,   # 使用更小的batch以降低资源需求
+                    epochs=50,  # 只训练一个epoch用于测试
+                    batch=4,   # 使用更小的batch以降低资源需求
                     workers=0,  # 减少worker数量，避免多线程问题
                     device=[0,],
                     optimizer='SGD',
                     project='runs/train',
                     name='debug',
                     single_cls=False,
+                    conf=0.001,
                     lr0=0.01,
                     cache=False,
-                    loss='TomatoDetectWithRankLoss(lambda_rank=0.2)',
+                    loss='TomatoDetectWithRankLoss(lambda_rank=5)',
                     verbose=True,
                     task='tomato',  # 明确指定使用tomato任务，确保使用TomatoYOLODataset
                     amp=False,      # 禁用自动混合精度训练，避免梯度缩放器错误

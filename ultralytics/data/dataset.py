@@ -726,21 +726,16 @@ class TomatoYOLODataset(YOLODataset):
         Returns:
             dict: 批次数据字典
         """
-        # 添加调试日志
-        if batch and len(batch) > 0:
-            LOGGER.debug(f"TomatoYOLODataset.collate_fn: 批次包含{len(batch)}个样本，第一个样本字段: {list(batch[0].keys())}")
+        if not batch:
+            return {}
             
         # 创建新的批次字典
-        new_batch = {}
-        keys = batch[0].keys() if batch and len(batch) > 0 else []
-        values = list(zip(*[list(b.values()) for b in batch])) if batch and len(batch) > 0 else []
+        new_batch = defaultdict(list)
+        for sample in batch:
+            for key, value in sample.items():
+                new_batch[key].append(value)
         
-        for i, k in enumerate(keys):
-            if i >= len(values):
-                LOGGER.warning(f"TomatoYOLODataset.collate_fn: 键{k}在values中没有对应值，跳过")
-                continue
-                
-            value = values[i]
+        for k, value in new_batch.items():
             if k == "img":
                 # 图像需要堆叠
                 value = torch.stack(value, 0)
@@ -799,7 +794,7 @@ class TomatoYOLODataset(YOLODataset):
                             if mask.any():
                                 v = v.clone()
                                 v[mask] += offset
-                                offset += int(v[mask].max().item()) + 1
+                                offset = int(v[mask].max().item()) + 1
                         tensors.append(v)
 
                     value = torch.cat(tensors, 0)
@@ -835,6 +830,8 @@ class TomatoYOLODataset(YOLODataset):
                 except Exception as e:
                     LOGGER.error(f"TomatoYOLODataset.collate_fn: 处理{k}时发生错误: {e}")
                     value = torch.zeros((0, 1), dtype=torch.float32)
+            elif k in ('ratio_pad', 'im_file', 'ori_shape', 'resized_shape'):
+                pass
             
             # 将处理后的值添加到新批次
             new_batch[k] = value

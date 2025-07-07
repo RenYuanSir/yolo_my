@@ -458,7 +458,7 @@ class DetectionModel(BaseModel):
 
     def init_criterion(self):
         """Initialize the loss criterion for the DetectionModel."""
-        return E2EDetectLoss(self) if getattr(self, "end2end", False) else v8DetectionLoss(self)
+        return v8DetectionLoss(self)
 
 
 class OBBModel(DetectionModel):
@@ -829,23 +829,32 @@ class TomatoDetectionModel(DetectionModel):
             tal_topk=self.tal_topk
         )
     
-    def set_rank_params(self, lambda_rank=0.2, margin=0.1, tal_topk=10):
+    def set_rank_params(self, lambda_rank=None, margin=None, tal_topk=None):
         """
         设置排序损失参数
         
         Args:
-            lambda_rank (float): 排序损失权重
-            margin (float): 排序边界
-            tal_topk (int): 任务对齐分配器的topk数量
+            lambda_rank (float, optional): 排序损失权重
+            margin (float, optional): 排序边界
+            tal_topk (int, optional): 任务对齐分配器的topk数量
         """
+        # 如果参数为None，保持当前值
+        lambda_rank = lambda_rank if lambda_rank is not None else self.lambda_rank
+        margin = margin if margin is not None else self.margin
+        tal_topk = tal_topk if tal_topk is not None else self.tal_topk
+        
+        # 更新参数
         self.lambda_rank = lambda_rank
         self.margin = margin
         self.tal_topk = tal_topk
+        
+        LOGGER.info(f"TomatoDetectionModel: 设置排序损失参数 lambda_rank={lambda_rank}, margin={margin}, tal_topk={tal_topk}")
         
         # 如果损失函数已初始化，则更新其参数
         if hasattr(self, 'criterion'):
             self.criterion.lambda_rank = lambda_rank
             self.criterion.margin = margin
+            LOGGER.info(f"已更新损失函数参数: lambda_rank={self.criterion.lambda_rank}, margin={self.criterion.margin}")
     
 
 
@@ -970,7 +979,6 @@ def torch_safe_load(weight, safe_only=False):
             attributes={
                 "ultralytics.nn.modules.block.Silence": "torch.nn.Identity",  # YOLOv9e
                 "ultralytics.nn.tasks.YOLOv10DetectionModel": "ultralytics.nn.tasks.DetectionModel",  # YOLOv10
-                "ultralytics.utils.loss.v10DetectLoss": "ultralytics.utils.loss.E2EDetectLoss",  # YOLOv10
             },
         ):
             if safe_only:

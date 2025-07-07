@@ -235,6 +235,16 @@ class BaseTrainer:
         self.model = self.model.to(self.device)
         self.set_model_attributes()
 
+        # 如果是番茄检测模型，设置排序损失参数
+        if hasattr(self.model, "set_rank_params"):
+            LOGGER.info("检测到番茄检测模型，设置排序损失参数")
+            # 这里不需要传递参数，因为set_rank_params会从self.args中解析参数
+            if hasattr(self, "set_rank_params"):
+                self.set_rank_params()  # 调用训练器的set_rank_params方法
+            else:
+                # 如果训练器没有set_rank_params方法，直接调用模型的方法
+                self.model.set_rank_params()
+
         # Freeze layers
         freeze_list = (
             self.args.freeze

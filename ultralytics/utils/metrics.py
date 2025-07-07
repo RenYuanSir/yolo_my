@@ -1292,3 +1292,164 @@ class OBBMetrics(SimpleClass):
     def curves_results(self):
         """Returns a list of curves for accessing specific metrics curves."""
         return []
+
+
+class TomatoMetrics(DetMetrics):
+    """
+    Utility class for computing tomato detection metrics including h_pos MAE and ranking accuracy.
+    
+    Args:
+        save_dir (Path): A path to the directory where the output plots will be saved. Defaults to current directory.
+        plot (bool): A flag that indicates whether to plot precision-recall curves for each class. Defaults to False.
+        on_plot (func): An optional callback to pass plots path and data when they are rendered. Defaults to None.
+        names (dict of str): A dict of strings that represents the names of the classes. Defaults to an empty tuple.
+
+    Attributes:
+        save_dir (Path): A path to the directory where the output plots will be saved.
+        plot (bool): A flag that indicates whether to plot the precision-recall curves for each class.
+        on_plot (func): An optional callback to pass plots path and data when they are rendered.
+        names (dict of str): A dict of strings that represents the names of the classes.
+        box (Metric): An instance of the Metric class for storing the results of the detection metrics.
+        h_pos (Metric): An instance of the Metric class for storing the results of the h_pos metrics.
+        speed (dict): A dictionary for storing the execution time of different parts of the detection process.
+        h_pos_stats (dict): A dictionary for storing h_pos related statistics.
+    """
+
+    def __init__(self, save_dir=Path("."), plot=False, on_plot=None, names={}) -> None:
+        """Initialize a TomatoMetrics instance with a save directory, plot flag, callback function, and class names."""
+        super().__init__(save_dir, plot, on_plot, names)
+        self.h_pos_stats = {'tp': [], 'conf': [], 'pred_h': [], 'target_h': []}
+        self.task = "tomato"
+
+    def process(self, tp, conf, pred_cls, target_cls, pred_h=None, target_h=None):
+        """
+        Process predicted results for tomato detection and update metrics.
+        
+        Args:
+            tp (torch.Tensor): True positive detections.
+            conf (torch.Tensor): Confidence scores.
+            pred_cls (torch.Tensor): Predicted classes.
+            target_cls (torch.Tensor): Target classes.
+            pred_h (torch.Tensor, optional): Predicted h_pos values.
+            target_h (torch.Tensor, optional): Target h_pos values.
+        """
+        # Process standard detection metrics
+        super().process(tp, conf, pred_cls, target_cls)
+        
+        # Process h_pos metrics if provided
+        if pred_h is not None and target_h is not None and len(pred_h) > 0 and len(target_h) > 0:
+            try:
+                # Calculate h_pos MAE
+                h_mae = torch.mean(torch.abs(pred_h - target_h)).item()
+                
+                # Calculate ranking accuracy
+                rank_acc = 0.0
+                if len(pred_h) > 1:
+                    sorted_indices = torch.argsort(target_h)
+                    pred_sorted = pred_h[sorted_indices]
+                    
+                    # Calculate correct orderings
+                    correct_order = (pred_sorted[1:] >= pred_sorted[:-1]).sum()
+                    total_pairs = len(pred_sorted) - 1
+                    
+                    if total_pairs > 0:
+                        rank_acc = (correct_order / total_pairs).item()
+                
+                # Store h_pos metrics
+                self.h_pos_stats['h_mae'] = h_mae
+                self.h_pos_stats['rank_acc'] = rank_acc
+                
+            except Exception as e:
+                LOGGER.warning(f"Could not compute h_pos metrics: {e}")
+
+    def update_h_pos_stats(self, tp, conf, pred_h, target_h):
+        """
+        Update h_pos statistics for batch processing.
+        
+        Args:
+            tp (torch.Tensor): True positive detections for h_pos.
+            conf (torch.Tensor): Confidence scores for h_pos.
+            pred_h (torch.Tensor): Predicted h_pos values.
+            target_h (torch.Tensor): Target h_pos values.
+        """
+        if len(tp) > 0:
+            self.h_pos_stats['tp'].append(tp)
+            self.h_pos_stats['conf'].append(conf)
+            self.h_pos_stats['pred_h'].append(pred_h)
+            self.h_pos_stats['target_h'].append(target_h)
+
+    @property
+    def keys(self):
+        """Returns a list of keys for accessing specific metrics."""
+        return [
+            "metrics/precision(B)", 
+            "metrics/recall(B)", 
+            "metrics/mAP50(B)", 
+            "metrics/mAP50-95(B)",
+            "metrics/h_mae",
+            "metrics/rank_acc"
+        ]
+
+    def mean_results(self):
+        """Calculate mean of detected objects & return precision, recall, mAP50, mAP50-95, h_mae, rank_acc."""
+        base_results = super().mean_results()
+        
+        # Add h_pos metrics
+        h_mae = self.h_pos_stats.get('h_mae', 0.0)
+        rank_acc = self.h_pos_stats.get('rank_acc', 0.0)
+        
+        return base_results + [h_mae, rank_acc]
+
+    def class_result(self, i):
+        """Return the result of evaluating the performance of a tomato detection model on a specific class."""
+        base_result = super().class_result(i)
+        
+        # Add h_pos metrics (same for all classes in current implementation)
+        h_mae = self.h_pos_stats.get('h_mae', 0.0)
+        rank_acc = self.h_pos_stats.get('rank_acc', 0.0)
+        
+        return base_result + [h_mae, rank_acc]
+
+    @property
+    def results_dict(self):
+        """Returns dictionary of computed performance metrics and statistics."""
+        return dict(zip(self.keys + ["fitness"], self.mean_results() + [self.fitness]))
+
+    def finalize_h_pos_metrics(self):
+        """Finalize h_pos metrics calculation from accumulated statistics."""
+        try:
+            if self.h_pos_stats['tp'] and len(self.h_pos_stats['tp']) > 0:
+                tp = torch.cat(self.h_pos_stats['tp']) if len(self.h_pos_stats['tp']) else torch.zeros(0)
+                conf = torch.cat(self.h_pos_stats['conf']) if len(self.h_pos_stats['conf']) else torch.zeros(0)
+                pred_h = torch.cat(self.h_pos_stats['pred_h']) if len(self.h_pos_stats['pred_h']) else torch.zeros(0)
+                target_h = torch.cat(self.h_pos_stats['target_h']) if len(self.h_pos_stats['target_h']) else torch.zeros(0)
+                
+                if len(pred_h) > 0 and len(target_h) > 0:
+                    # Calculate h_pos MAE
+                    h_mae = torch.mean(torch.abs(pred_h - target_h)).item()
+                    self.h_pos_stats['h_mae'] = h_mae
+                    
+                    # Calculate ranking accuracy
+                    if len(pred_h) > 1:
+                        sorted_indices = torch.argsort(target_h)
+                        pred_sorted = pred_h[sorted_indices]
+                        
+                        correct_order = (pred_sorted[1:] >= pred_sorted[:-1]).sum()
+                        total_pairs = len(pred_sorted) - 1
+                        
+                        if total_pairs > 0:
+                            rank_acc = (correct_order / total_pairs).item()
+                            self.h_pos_stats['rank_acc'] = rank_acc
+                        else:
+                            self.h_pos_stats['rank_acc'] = 0.0
+                    else:
+                        self.h_pos_stats['rank_acc'] = 0.0
+                        
+        except Exception as e:
+            LOGGER.warning(f"Could not finalize h_pos metrics: {e}")
+            self.h_pos_stats['h_mae'] = 0.0
+            self.h_pos_stats['rank_acc'] = 0.0
+
+    def reset_h_pos_stats(self):
+        """Reset h_pos statistics."""
+        self.h_pos_stats = {'tp': [], 'conf': [], 'pred_h': [], 'target_h': []}
