@@ -557,14 +557,11 @@ class TomatoYOLODataset(YOLODataset):
         Returns:
             dict: 更新后的标签字典
         """
-        # 添加调试日志
-        LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 原始标签字段: {list(label.keys())}")
+        # 首先调用父类方法处理基本标签格式
+        label = super().update_labels_info(label)
         
-        # 首先检查边界框是否存在且有效
+        # 如果没有边界框或边界框为空，直接返回
         if "bboxes" not in label or not isinstance(label["bboxes"], (np.ndarray, torch.Tensor)) or label["bboxes"].shape[0] == 0:
-            # 如果没有边界框或边界框为空，调用父类方法
-            label = super().update_labels_info(label)
-            
             # 确保有必要的字段
             if self.has_cluster_ids and "cluster_ids" not in label:
                 label["cluster_ids"] = np.zeros((0, 1), dtype=np.float32)
@@ -572,146 +569,69 @@ class TomatoYOLODataset(YOLODataset):
                 label["h_rel"] = np.zeros((0, 1), dtype=np.float32)
                 
             return label
-            
-        # 记录原始边界框形状
-        bboxes = label["bboxes"]
-        original_shape = bboxes.shape
-        LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 原始边界框形状: {original_shape}")
         
         # 检查坐标是否需要归一化（如果值大于1.0）
+        bboxes = label["bboxes"]
         if isinstance(bboxes, np.ndarray) and np.any(bboxes > 1.0):
             # 获取图像尺寸
             img_h, img_w = None, None
-            if "img_hw" in label:
-                img_h, img_w = label["img_hw"]
-            elif "img" in label:
+            for key in ["img_hw", "shape", "ori_shape"]:
+                if key in label:
+                    img_h, img_w = label[key]
+                    break
+            if "img" in label:
                 img_h, img_w = label["img"].shape[:2] if isinstance(label["img"], np.ndarray) else label["img"].shape[-2:]
-            elif "shape" in label:
-                img_h, img_w = label["shape"]
-            elif "ori_shape" in label:
-                img_h, img_w = label["ori_shape"]
                 
             # 如果能获取到图像尺寸，则进行归一化
             if img_h is not None and img_w is not None:
                 is_xyxy = (bboxes[:, 2:4] > bboxes[:, 0:2]).all()  # 检查是否为xyxy格式
                 
                 if is_xyxy:
-                    # XYXY格式边界框归一化
-                    LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 检测到XYXY格式边界框，进行归一化 (/{img_w}, /{img_h})")
-                    bboxes[:, [0, 2]] /= img_w  # 归一化x坐标
-                    bboxes[:, [1, 3]] /= img_h  # 归一化y坐标
-                    
-                    # 转换为中心点格式(XYWH)
-                    x1, y1, x2, y2 = bboxes[:, 0], bboxes[:, 1], bboxes[:, 2], bboxes[:, 3]
+                    # XYXY格式转换为XYWH格式并归一化
+                    x1, y1, x2, y2 = bboxes[:, 0] / img_w, bboxes[:, 1] / img_h, bboxes[:, 2] / img_w, bboxes[:, 3] / img_h
                     cx = (x1 + x2) / 2  # 中心点x坐标
                     cy = (y1 + y2) / 2  # 中心点y坐标
-                    w = x2 - x1         # 宽度
-                    h = y2 - y1         # 高度
-
-                    # 检查并修正异常宽度和高度
-                    w_clamped = np.clip(w, 1e-6, None)
-                    h_clamped = np.clip(h, 1e-6, None)
-                    if np.any(w != w_clamped) or np.any(h != h_clamped):
-                        LOGGER.warning(
-                            "TomatoYOLODataset.update_labels_info: Detected non-positive width/height when converting from XYXY; clamped to epsilon"
-                        )
-                    w, h = w_clamped, h_clamped
-
-                    # 重组并更新边界框
+                    w = np.clip(x2 - x1, 1e-6, None)  # 宽度，避免非正值
+                    h = np.clip(y2 - y1, 1e-6, None)  # 高度，避免非正值
                     bboxes = np.stack([cx, cy, w, h], axis=1)
-                    LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 转换为XYWH格式: {bboxes.shape}")
                 else:
-                    # XYWH格式但需要归一化
-                    LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 检测到未归一化的XYWH格式边界框，进行归一化")
+                    # XYWH格式直接归一化
                     bboxes[:, 0] /= img_w  # 归一化中心点x
                     bboxes[:, 1] /= img_h  # 归一化中心点y
                     bboxes[:, 2] /= img_w  # 归一化宽度
                     bboxes[:, 3] /= img_h  # 归一化高度
-                    w_clamped = np.clip(bboxes[:, 2], 1e-6, None)
-                    h_clamped = np.clip(bboxes[:, 3], 1e-6, None)
-                    if np.any(bboxes[:, 2] != w_clamped) or np.any(bboxes[:, 3] != h_clamped):
-                        LOGGER.warning(
-                            "TomatoYOLODataset.update_labels_info: Detected non-positive width/height during normalization; clamped to epsilon"
-                        )
-                    bboxes[:, 2] = w_clamped
-                    bboxes[:, 3] = h_clamped
+                    # 避免宽高为非正值
+                    bboxes[:, 2] = np.clip(bboxes[:, 2], 1e-6, None)
+                    bboxes[:, 3] = np.clip(bboxes[:, 3], 1e-6, None)
                 
                 # 更新标签中的边界框
                 label["bboxes"] = bboxes
                 label["normalized"] = True
-                
-                LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 归一化后的边界框范围: x=[{bboxes[:, 0].min():.4f}, {bboxes[:, 0].max():.4f}], y=[{bboxes[:, 1].min():.4f}, {bboxes[:, 1].max():.4f}]")
-                LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 归一化后的边界框范围: w=[{bboxes[:, 2].min():.4f}, {bboxes[:, 2].max():.4f}], h=[{bboxes[:, 3].min():.4f}, {bboxes[:, 3].max():.4f}]")
         
-        # 检查边界框是否包含扩展信息 (额外的列)
-        bbox_shape = label["bboxes"].shape
-        if bbox_shape[1] > 4:
-            LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 发现扩展边界框，列数={bbox_shape[1]}")
-            
-            # 提取标准的4列边界框
-            bboxes_standard = label["bboxes"][:, :4]
-            
-            # 处理cluster_ids (第5列)
-            if bbox_shape[1] >= 5 and "cluster_ids" not in label and self.has_cluster_ids:
-                if isinstance(label["bboxes"], np.ndarray):
-                    label["cluster_ids"] = label["bboxes"][:, 4:5]
-                else:  # torch.Tensor
-                    label["cluster_ids"] = label["bboxes"][:, 4:5].clone()  # 使用clone防止共享内存
-                LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 从边界框提取cluster_ids，形状={label['cluster_ids'].shape}")
-            
-            # 处理h_rel (第6列)
-            if bbox_shape[1] >= 6 and "h_rel" not in label and self.has_h_rel:
-                if isinstance(label["bboxes"], np.ndarray):
-                    label["h_rel"] = label["bboxes"][:, 5:6]
-                else:  # torch.Tensor
-                    label["h_rel"] = label["bboxes"][:, 5:6].clone()  # 使用clone防止共享内存
-                LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 从边界框提取h_rel，形状={label['h_rel'].shape}")
-            
-            # 更新边界框为标准4列格式
-            label["bboxes"] = bboxes_standard
-            LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 更新边界框为标准格式，新形状={label['bboxes'].shape}")
+        # 确保必要的字段存在（假定自定义字段已由cache_labels正确提供）
+        num_boxes = label["bboxes"].shape[0]
         
-        # 确保cluster_ids和h_rel字段存在（如果需要）
+        # 确保cluster_ids字段存在
         if self.has_cluster_ids and "cluster_ids" not in label:
-            # 如果指定需要cluster_ids但标签中没有，创建默认值
-            num_boxes = label["bboxes"].shape[0]
             if isinstance(label["bboxes"], np.ndarray):
                 label["cluster_ids"] = np.zeros((num_boxes, 1), dtype=np.float32)
             else:  # torch.Tensor
                 label["cluster_ids"] = torch.zeros((num_boxes, 1), dtype=torch.float32)
-            LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 创建默认cluster_ids，形状={label['cluster_ids'].shape}")
         
+        # 确保h_rel字段存在
         if self.has_h_rel and "h_rel" not in label:
-            # 如果指定需要h_rel但标签中没有，创建默认值
-            num_boxes = label["bboxes"].shape[0]
             if isinstance(label["bboxes"], np.ndarray):
                 label["h_rel"] = np.zeros((num_boxes, 1), dtype=np.float32)
             else:  # torch.Tensor
                 label["h_rel"] = torch.zeros((num_boxes, 1), dtype=torch.float32)
-            LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 创建默认h_rel，形状={label['h_rel'].shape}")
         
-        # 确保cluster_ids和h_rel是正确的数组类型和形状
-        if "cluster_ids" in label:
-            if isinstance(label["cluster_ids"], list):
-                label["cluster_ids"] = np.array(label["cluster_ids"]).reshape(-1, 1)
-            elif isinstance(label["cluster_ids"], np.ndarray) and label["cluster_ids"].ndim == 1:
-                label["cluster_ids"] = label["cluster_ids"].reshape(-1, 1)
-            elif isinstance(label["cluster_ids"], torch.Tensor) and label["cluster_ids"].ndim == 1:
-                label["cluster_ids"] = label["cluster_ids"].reshape(-1, 1)
-        
-        if "h_rel" in label:
-            if isinstance(label["h_rel"], list):
-                label["h_rel"] = np.array(label["h_rel"]).reshape(-1, 1)
-            elif isinstance(label["h_rel"], np.ndarray) and label["h_rel"].ndim == 1:
-                label["h_rel"] = label["h_rel"].reshape(-1, 1)
-            elif isinstance(label["h_rel"], torch.Tensor) and label["h_rel"].ndim == 1:
-                label["h_rel"] = label["h_rel"].reshape(-1, 1)
-        
-        # 调用父类方法处理基本标签
-        label = super().update_labels_info(label)
-        
-        # 记录处理后的字段
-        LOGGER.debug(f"TomatoYOLODataset.update_labels_info: 处理后标签字段: {list(label.keys())}")
+        # 确保字段形状正确
+        for field in ["cluster_ids", "h_rel"]:
+            if field in label:
+                if isinstance(label[field], list):
+                    label[field] = np.array(label[field]).reshape(-1, 1)
+                elif isinstance(label[field], (np.ndarray, torch.Tensor)) and label[field].ndim == 1:
+                    label[field] = label[field].reshape(-1, 1)
         
         return label
         

@@ -2881,7 +2881,6 @@ class TomatoFormat(Format):
             batch_idx=batch_idx,
             bgr=bgr,
         )
-        LOGGER.info("初始化TomatoFormat格式化器")
     
     def __call__(self, labels):
         """
@@ -2896,141 +2895,52 @@ class TomatoFormat(Format):
         Returns:
             dict: 格式化后的数据字典
         """
-        # 获取图像
-        img = labels.get("img", torch.zeros(3, 640, 640))
+        # 首先调用父类方法处理基本格式化
+        result = super().__call__(labels)
         
-        # 准备基础数据结构
-        if "instances" not in labels:
-            LOGGER.debug("TomatoFormat: 输入标签中没有instances字段")
-            # 如果没有instances对象，则首先从父类方法中获取创建的空实例
-            result = super().__call__(labels)
-            
-            # 处理番茄特有字段
-            if "cluster_ids" not in result and "cluster_ids" in labels:
-                # 如果result中没有cluster_ids但labels中有，则将其添加到result中
-                if isinstance(labels["cluster_ids"], np.ndarray):
-                    result["cluster_ids"] = torch.from_numpy(labels["cluster_ids"])
-                elif isinstance(labels["cluster_ids"], torch.Tensor):
-                    result["cluster_ids"] = labels["cluster_ids"]
-                else:
-                    LOGGER.warning(f"TomatoFormat: 无法处理类型为 {type(labels['cluster_ids'])} 的cluster_ids")
-                    # 创建空的cluster_ids
-                    result["cluster_ids"] = torch.zeros((0, 1), dtype=torch.float32)
-            
-            if "h_rel" not in result and "h_rel" in labels:
-                # 如果result中没有h_rel但labels中有，则将其添加到result中
-                if isinstance(labels["h_rel"], np.ndarray):
-                    result["h_rel"] = torch.from_numpy(labels["h_rel"])
-                elif isinstance(labels["h_rel"], torch.Tensor):
-                    result["h_rel"] = labels["h_rel"]
-                else:
-                    LOGGER.warning(f"TomatoFormat: 无法处理类型为 {type(labels['h_rel'])} 的h_rel")
-                    # 创建空的h_rel
-                    result["h_rel"] = torch.zeros((0, 1), dtype=torch.float32)
-            
-            # 如果result中没有cluster_ids或h_rel，但需要这些字段，则创建空的
-            if "cluster_ids" not in result:
-                result["cluster_ids"] = torch.zeros((0, 1), dtype=torch.float32)
-            if "h_rel" not in result:
-                result["h_rel"] = torch.zeros((0, 1), dtype=torch.float32)
-                
-            return result
-                
-        # 正常处理有instances的情况
-        instances = labels.pop("instances")
+        # 确定实例数量
+        nl = len(result["bboxes"]) if "bboxes" in result else 0
         
-        # 获取标签类别
-        cls = labels.pop("cls") if "cls" in labels else instances.cls
-        
-        # 处理空的实例 - 如果长度为0的实例
-        if len(instances) == 0:
-            LOGGER.debug("TomatoFormat: 处理空实例 (length=0)")
-            # 创建基本结果字典
-            result = {
-                "img": img,
-                "cls": cls if isinstance(cls, torch.Tensor) else torch.zeros((0, 1), dtype=torch.float32),
-                "bboxes": torch.zeros((0, 4), dtype=torch.float32),
-                "batch_idx": torch.zeros(0, dtype=torch.float32),
-                "cluster_ids": torch.zeros((0, 1), dtype=torch.float32),
-                "h_rel": torch.zeros((0, 1), dtype=torch.float32)
-        }
-            return result
-        
-        # 获取实例的番茄特有属性
-        cluster_ids = getattr(instances, "cluster_ids", None)
-        h_rel = getattr(instances, "h_rel", None)
-        
-        # 确保实例数据与类别数据匹配
-        if isinstance(cls, torch.Tensor) and cls.shape[0] != len(instances):
-            LOGGER.warning(f"TomatoFormat: 类别数量 ({cls.shape[0]}) 与实例数量 ({len(instances)}) 不匹配")
-            # 尝试调整类别数据大小以匹配实例数量
-            if cls.shape[0] == 0:
-                # 如果没有类别数据，创建全零数组
-                cls = torch.zeros((len(instances), 1), dtype=torch.float32)
-            elif cls.shape[0] > len(instances):
-                # 如果类别数据过多，截断
-                cls = cls[:len(instances)]
-            else:
-                # 如果类别数据不足，填充
-                padding = torch.zeros((len(instances) - cls.shape[0], 1), dtype=cls.dtype)
-                cls = torch.cat([cls, padding], dim=0)
-        
-        # 定义结果字典
-        result = {
-            "img": img,
-            "cls": cls,
-            "bboxes": instances.bboxes,
-            "batch_idx": torch.zeros(len(instances)),
-        }
-        
-        # 添加番茄特有属性
-        if cluster_ids is not None:
-            # 转换为张量
+        # 处理cluster_ids
+        if "cluster_ids" in labels:
+            # 如果源标签中有cluster_ids，转换为正确格式
+            cluster_ids = labels["cluster_ids"]
             if isinstance(cluster_ids, np.ndarray):
                 result["cluster_ids"] = torch.from_numpy(cluster_ids)
             elif isinstance(cluster_ids, torch.Tensor):
                 result["cluster_ids"] = cluster_ids
             else:
-                # 如果无法解析，创建默认值
-                result["cluster_ids"] = torch.zeros((len(instances), 1), dtype=torch.float32)
+                # 尝试转换其他类型
+                try:
+                    result["cluster_ids"] = torch.tensor(cluster_ids)
+                except:
+                    result["cluster_ids"] = torch.zeros((nl, 1), dtype=torch.float32)
         else:
-            # 创建空的cluster_ids
-            result["cluster_ids"] = torch.zeros((len(instances), 1), dtype=torch.float32)
-            
-        if h_rel is not None:
-            # 转换为张量
+            # 如果源标签中没有cluster_ids，创建默认值
+            result["cluster_ids"] = torch.zeros((nl, 1), dtype=torch.float32)
+        
+        # 处理h_rel
+        if "h_rel" in labels:
+            # 如果源标签中有h_rel，转换为正确格式
+            h_rel = labels["h_rel"]
             if isinstance(h_rel, np.ndarray):
                 result["h_rel"] = torch.from_numpy(h_rel)
             elif isinstance(h_rel, torch.Tensor):
                 result["h_rel"] = h_rel
             else:
-                # 如果无法解析，创建默认值
-                result["h_rel"] = torch.zeros((len(instances), 1), dtype=torch.float32)
-        else:
-            # 创建空的h_rel
-            result["h_rel"] = torch.zeros((len(instances), 1), dtype=torch.float32)
-        
-        # 确保数据类型正确
-        # 数据增强变换可能需要numpy数组，但最终应该转换为PyTorch张量
-        for k in result:
-            if k == "img":  # 图像已经是正确类型
-                continue
-                
-            if isinstance(result[k], np.ndarray):
-                # 将numpy数组转换为PyTorch张量
-                result[k] = torch.from_numpy(result[k])
-            elif not isinstance(result[k], torch.Tensor):
-                # 如果不是numpy数组也不是PyTorch张量，则尝试转换
+                # 尝试转换其他类型
                 try:
-                    result[k] = torch.tensor(result[k])
-                except Exception as e:
-                    LOGGER.warning(f"TomatoFormat: 无法将{k}转换为PyTorch张量，类型为 {type(result[k])}, 错误: {e}")
-                    # 根据k的不同创建适当的空张量
-                    if k == "cls" or k == "cluster_ids" or k == "h_rel":
-                        result[k] = torch.zeros((len(instances), 1), dtype=torch.float32)
-                    elif k == "bboxes":
-                        result[k] = torch.zeros((len(instances), 4), dtype=torch.float32)
-                    elif k == "batch_idx":
-                        result[k] = torch.zeros(len(instances), dtype=torch.float32)
+                    result["h_rel"] = torch.tensor(h_rel)
+                except:
+                    result["h_rel"] = torch.zeros((nl, 1), dtype=torch.float32)
+        else:
+            # 如果源标签中没有h_rel，创建默认值
+            result["h_rel"] = torch.zeros((nl, 1), dtype=torch.float32)
+        
+        # 确保维度正确
+        for field in ["cluster_ids", "h_rel"]:
+            if field in result:
+                if result[field].ndim == 1:
+                    result[field] = result[field].reshape(-1, 1)
         
         return result

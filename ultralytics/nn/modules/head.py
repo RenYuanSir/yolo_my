@@ -727,7 +727,7 @@ class Detect_Efficient_Tomato(Detect_Efficient):
             box, cls = x_cat.split((self.reg_max * 4, self.nc), 1)
             hrel = h_pos_cat
         
-        dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+        dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1)
         # 最终输出拼接h_rel（使用sigmoid激活）
         y = torch.cat((dbox, cls.sigmoid(), hrel.sigmoid()), 1)
         
@@ -743,5 +743,5 @@ class Detect_Efficient_Tomato(Detect_Efficient):
             # 分类预测初始化 - focal loss偏置调整
             b.bias.data[:m.nc] = math.log(5 / m.nc / (640 / s) ** 2)  # cls
             
-            # 高度预测初始化 - 默认值为0.5
-            c.bias.data[:] = 0.5  # h_rel - 使用0.5作为相对高度的默认初始值
+            # 高度预测初始化 - 默认值为0.0
+            torch.nn.init.uniform_(c.bias.data, a=-0.1, b=0.1)  # h_rel - 使用0.0作为相对高度的默认初始值

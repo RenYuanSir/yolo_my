@@ -182,7 +182,7 @@ class v8DetectionLoss:
         self.bbox_loss = BboxLoss(m.reg_max).to(device)
         self.proj = torch.arange(m.reg_max, dtype=torch.float, device=device)
 
-    def preprocess(self, targets, batch_size):
+    def preprocess(self, targets, batch_size, scale_tensor):
         """Preprocesses the target counts and matches with the input batch size to output a tensor."""
         nl, ne = targets.shape
         if nl == 0:
@@ -196,7 +196,7 @@ class v8DetectionLoss:
                 matches = i == j
                 if n := matches.sum():
                     out[j, :n] = targets[matches, 1:]
-            out[..., 1:5] = xywh2xyxy(out[..., 1:5])
+            out[..., 1:5] = xywh2xyxy(out[..., 1:5].mul_(scale_tensor))
         return out
 
 
@@ -368,6 +368,14 @@ class v8DetectionLoss:
 
         return loss.sum() * batch_size, loss.detach()  # loss(box, cls, dfl)
 
+    def bbox_decode(self, anchor_points, pred_dist):
+        """Decode predicted object bounding box coordinates from anchor points and distribution."""
+        if self.use_dfl:
+            b, a, c = pred_dist.shape  # batch, anchors, channels
+            pred_dist = pred_dist.view(b, a, 4, c // 4).softmax(3).matmul(self.proj.type(pred_dist.dtype))
+            # pred_dist = pred_dist.view(b, a, c // 4, 4).transpose(2,3).softmax(3).matmul(self.proj.type(pred_dist.dtype))
+            # pred_dist = (pred_dist.view(b, a, c // 4, 4).softmax(2) * self.proj.type(pred_dist.dtype).view(1, 1, -1, 1)).sum(2)
+        return dist2bbox(pred_dist, anchor_points, xywh=False)
 
 class v8SegmentationLoss(v8DetectionLoss):
     """Criterion class for computing training losses."""
@@ -849,7 +857,7 @@ class SafeBboxLoss:
         self.device = device
         return self
         
-    def __call__(self, pred_dist, pred_bboxes, anchor_points, target_bboxes, target_scores, target_scores_sum, fg_mask, eps=1e-8):
+    def __call__(self, pred_dist, pred_bboxes, anchor_points, stride_tensor, target_bboxes, target_scores, target_scores_sum, fg_mask, eps=1e-8):
         """
         计算边界框损失和DFL损失
         
@@ -857,6 +865,7 @@ class SafeBboxLoss:
             pred_dist (tensor): 预测的分布
             pred_bboxes (tensor): 预测的边界框
             anchor_points (tensor): 锚点
+            stride_tensor (tensor): 步长张量
             target_bboxes (tensor): 目标边界框
             target_scores (tensor): 目标分数
             target_scores_sum (float): 目标分数的总和
@@ -870,9 +879,38 @@ class SafeBboxLoss:
         if fg_mask.sum() == 0:
             return torch.tensor(0.0).to(pred_dist.device), torch.tensor(0.0).to(pred_dist.device)
               
-        # 在前景位置提取预测和目标
-        pred_bboxes_pos = pred_bboxes[fg_mask]
-        pred_dist_pos = pred_dist[fg_mask]
+        # 确保fg_mask是布尔类型
+        fg_mask = fg_mask.bool()
+        
+        # 检查维度匹配问题
+        if pred_bboxes.dim() == 3 and fg_mask.dim() == 2:
+            B = pred_bboxes.shape[0]  # 获取批次大小
+            # 将fg_mask扩展到匹配pred_bboxes的批次维度
+            expanded_fg_mask = fg_mask.unsqueeze(0).expand(B, -1, -1)
+            # 使用view调整形状以匹配索引需求
+            expanded_fg_mask = expanded_fg_mask.view(B, -1)
+            
+            # 使用expanded_fg_mask处理批次维度的索引
+            pred_bboxes_list = []
+            pred_dist_list = []
+            for i in range(B):
+                batch_mask = expanded_fg_mask[i]
+                if batch_mask.sum() > 0:
+                    pred_bboxes_list.append(pred_bboxes[i, batch_mask])
+                    pred_dist_list.append(pred_dist[i, batch_mask])
+            
+            # 如果存在有效预测，则合并结果
+            if pred_bboxes_list:
+                pred_bboxes_pos = torch.cat(pred_bboxes_list, dim=0)
+                pred_dist_pos = torch.cat(pred_dist_list, dim=0)
+            else:
+                # 如果没有有效预测，创建空张量
+                return torch.tensor(0.0).to(pred_dist.device), torch.tensor(0.0).to(pred_dist.device)
+        else:
+            # 原始索引方式，适用于维度匹配的情况
+            pred_bboxes_pos = pred_bboxes[fg_mask]
+            pred_dist_pos = pred_dist[fg_mask]
+          
         target_bboxes_pos = target_bboxes[fg_mask] 
         # scale target_bboxes from [0,1] → [0, image_size]
         print("\n" + "="*60)
@@ -939,27 +977,30 @@ class SafeBboxLoss:
         
         # 计算DFL损失
         try:
-            # target_ltrb: shape [num_fg, 4]
-            target_ltrb = bbox2dist(anchor_points_pos, target_bboxes_pos, self.reg_max)
-            target_ltrb = target_ltrb.view(-1)
+            # 1. 计算原始的、巨大的像素距离
+            target_ltrb_pixel = bbox2dist(anchor_points_pos, target_bboxes_pos, self.reg_max - 1)
+
+            # 2. 获取正样本对应的步长(stride)
+            #    stride_tensor 形状为 [1, N_anchors], 我们需要扩展并筛选
+            strides_pos = stride_tensor.t().expand(B, -1)[fg_mask] # 形状: [num_fg]
+
+            # 3. !! 进行尺度翻译：将像素距离除以步长 !!
+            #    unsqueeze(-1) 是为了广播 [num_fg, 1] 到 [num_fg, 4]
+            target_ltrb_scaled = target_ltrb_pixel / strides_pos.unsqueeze(-1)
             
-            # reshape pred_dist → [num_fg * 4, reg_max + 1]
-            pred_dfl = pred_dist_pos.view(-1, 4, self.reg_max).reshape(-1, self.reg_max)  
-
+            # 4. 用缩放后的、DFL能理解的目标来计算损失
+            #    reshape pred_dist → [num_fg * 4, reg_max]
+            pred_dfl = pred_dist_pos.view(-1, self.reg_max)
+            target_dfl = target_ltrb_scaled.view(-1)
             
-            # flatten target → [num_fg * 4]
-            target_dfl = target_ltrb.view(-1)
-
-
-            # 计算 DFL
             loss_dfl = self._df_loss(pred_dfl, target_dfl)
-
+            
             # 应用权重（广播）
-            weight = weight.expand(-1, 4).reshape(-1)
-            loss_dfl = (loss_dfl * weight).sum() / target_scores_sum
+            # weight 是 [num_fg, 1], 扩展并重塑为 [num_fg * 4]
+            weight_dfl = weight.expand(-1, 4).reshape(-1)
+            loss_dfl = (loss_dfl * weight_dfl).sum() / target_scores_sum
 
             if torch.isnan(loss_dfl) or torch.isinf(loss_dfl):
-                LOGGER.warning(f"SafeBboxLoss: DFL损失为{loss_dfl.item()}，设置为0!")
                 loss_dfl = torch.tensor(0.0).to(pred_dist.device)
         except Exception as e:
             LOGGER.error(f"SafeBboxLoss: 计算DFL损失时出错: {e}")
@@ -1026,381 +1067,128 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
         self.DFL = DFL(self.reg_max + 1)  # ⚠️ 是 DFL 不是 DFLoss
         self.lambda_rank = lambda_rank  # 排序损失的权重系数
         self.margin = margin  # 排序损失的间隔阈值
-        
-        # 创建SafeBboxLoss实例
-        reg_max = 16
-        if hasattr(model, 'model') and hasattr(model.model[-1], 'reg_max'):
-            reg_max = model.model[-1].reg_max
-        self.bbox_loss = SafeBboxLoss(reg_max).to(self.device)
+        self.focal_loss = FocalLoss()
+        self.use_dfl = self.reg_max > 1
+        self.proj = torch.arange(self.reg_max, dtype=torch.float).to(self.device)
+        self.bbox_decode = super().bbox_decode
+        self.bce = nn.BCEWithLogitsLoss(reduction="none")
         
         LOGGER.info(f"初始化番茄检测与排序损失，lambda_rank={lambda_rank}, margin={margin}, tal_topk={tal_topk}")
-        LOGGER.info(f"使用安全版边界框损失计算器: SafeBboxLoss(reg_max={reg_max})")
+        LOGGER.info(f"使用标准v8DetectionLoss中的边界框损失计算器: BboxLoss(reg_max={self.reg_max})")
         
-        # 总是使用DFL
-        self.use_dfl = True
-        
-    def bce(self, pred_scores, target_scores, weight=None, fg_mask=None):
-        """
-        带掩码的二元交叉熵损失
-        
-        Args:
-            pred_scores: 预测分数 [batch_size, num_anchors, num_classes]
-            target_scores: 目标分数 [batch_size, num_anchors, num_classes]
-            weight: 可选权重 [batch_size, num_anchors, num_classes]
-            fg_mask: 前景掩码 [batch_size, num_anchors]
-            
-        Returns:
-            损失: 交叉熵损失
-        """
-        # 如果没有前景掩码，使用所有点
-        if fg_mask is None:
-            # 仅在目标分数不为零的位置计算BCE损失
-            mask = target_scores.sum(dim=-1) > 0
-            if mask.sum() == 0:
-                return torch.tensor(0.0, device=pred_scores.device, requires_grad=True)
-                
-            # 计算损失
-            loss = F.binary_cross_entropy_with_logits(
-                pred_scores[mask], target_scores[mask], reduction='none'
-            )
-            
-            # 应用权重
-            if weight is not None:
-                loss = loss * weight[mask]
-                
-            return loss
-        else:
-            # 使用前景掩码
-            # 首先确保掩码维度匹配
-            if fg_mask.dim() == 2:
-                fg_mask = fg_mask.unsqueeze(-1).expand_as(target_scores)
-            
-            # 仅在前景位置计算BCE损失
-            if fg_mask.sum() == 0:
-                return torch.tensor(0.0, device=pred_scores.device, requires_grad=True)
-                
-            # 计算损失
-            loss = F.binary_cross_entropy_with_logits(
-                pred_scores[fg_mask], target_scores[fg_mask], reduction='none'
-            )
-            
-            # 应用权重
-            if weight is not None:
-                loss = loss * weight[fg_mask]
-                
-            return loss
+
     
-    def decode_dfl(self, pred_distri):
-        """
-        将预测的分布映射为连续的 ltrb 距离。
-
-        Args:
-            pred_distri: Tensor of shape [B, N, 4 * reg_max]
-
-        Returns:
-            Tensor: Decoded distances of shape [B, N, 4]
-        """
-        B, N, _ = pred_distri.shape
-        pred = pred_distri.view(B, N, 4, self.reg_max)  # [B, N, 4, reg_max]
-        pred_prob = F.softmax(pred, dim=-1)
-        proj = torch.arange(self.reg_max, dtype=pred.dtype, device=pred.device)
-        pred_ltrb = (pred_prob * proj).sum(-1)  # [B, N, 4]
-        return pred_ltrb
 
 
     def __call__(self, preds, batch):
         """
-        Forward pass through the loss function.
-        
-        Args:
-            preds (torch.Tensor | dict): Predictions from the model.
-            batch (dict): Batch data containing images and labels.
-            
-        Returns:
-            tuple: A tuple containing the total loss and individual loss items.
+        该方法整合了YOLOv8官方的v8DetectionLoss.__call__的标准流程，
+        并精确地注入了自定义的rank_loss计算，确保了所有基础计算的正确性。
         """
-        
-        
-        # 规范化预测和提取核心特征
-        feats, pred_h_pos = self._normalize_predictions(preds)
-        if feats is None:
-            # 预测结果无效，返回零损失
-            zero_loss = torch.zeros(1, device=self.device)
-            return zero_loss, torch.zeros(4, device=self.device)
-            
-        # 从特征中提取预测分布和分数
-        pred_distri, pred_scores = self._extract_predictions(feats)
-        pred_h_pos_tensor = None
-        if pred_h_pos is not None and len(pred_h_pos) > 0:
-            pred_h_cat = torch.cat([p.view(p.shape[0], 1, -1) for p in pred_h_pos], dim=2)
-            pred_h_pos_tensor = pred_h_cat.permute(0, 2, 1).contiguous()
-        
-        # 获取批次大小和图像大小
-        batch_size = pred_scores.shape[0]
+        print("🕵️  DEBUGGING INSIDE TomatoDetectWithRankLoss")
+        print(f"    raw input bbox sample 5: {batch['bboxes'][:5]}")
+        feats = preds["features"]
+        pred_h_pos = preds["h_pos"]
+
+        # 2. 以下完全遵循官方代码，进行预测的解包和准备工作
+        loss = torch.zeros(3, device=self.device)  # box, cls, dfl
+        pred_distri, pred_scores = torch.cat([xi.view(feats[0].shape[0], self.no, -1) for xi in feats], 2).split(
+            (self.reg_max * 4, self.nc), 1
+        )
+        pred_scores = pred_scores.permute(0, 2, 1).contiguous()
+        pred_distri = pred_distri.permute(0, 2, 1).contiguous()
+
         dtype = pred_scores.dtype
+        batch_size = pred_scores.shape[0]
         imgsz = torch.tensor(feats[0].shape[2:], device=self.device, dtype=dtype) * self.stride[0]
-        
-        # 创建锚点网格和步长张量
         anchor_points, stride_tensor = make_anchors(feats, self.stride, 0.5)
 
-        
-        
-        # 准备目标数据
+        # 3. 准备真值 (Targets)，并将其转换为像素级坐标
         targets = torch.cat((batch["batch_idx"].view(-1, 1), batch["cls"].view(-1, 1), batch["bboxes"]), 1)
-        targets = self.preprocess(targets.to(self.device), batch_size)
-        
+        # 关键：创建并传递 scale_tensor，将真值框反归一化为像素级
+        scale_tensor = torch.tensor([imgsz[1], imgsz[0], imgsz[1], imgsz[0]], device=self.device)
+        targets = self.preprocess(targets.to(self.device), batch_size, scale_tensor)
+        gt_labels, gt_bboxes = targets.split((1, 4), 2)  # cls, xyxy (现在是像素级)
+        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0.0)
 
-        
-        # 分离标签和边界框  
-        
-        gt_labels, gt_bboxes = targets.split((1, 4), 2)  # cls, xyxy
-        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0)  # 非零边界框的掩码
-       
-        
-        # 将预测边界框形式转换为XYXY格式
-        # 正确方式：先解码DFL，再传入dist2bbox
-        pred_ltrb = self.decode_dfl(pred_distri)  # [B, N, 4]
-        grid_pred_bboxes = dist2bbox(pred_ltrb, anchor_points, xywh=False)
-        pred_bboxes = grid_pred_bboxes * stride_tensor.unsqueeze(0)  # [B, N, 4]
-        
+        # 4. 解码预测框 (官方流程)
+        pred_bboxes = self.bbox_decode(anchor_points, pred_distri)  # 输出归一化的 xyxy
 
-        
-        
-
-        # 分配正样本
-        
+        # 5. 正样本分配 (官方流程) - 在此环节将预测框和锚点放大到像素级
         target_labels, target_bboxes, target_scores, fg_mask, target_gt_idx = self.assigner(
-                pred_scores.detach().sigmoid(),
-                pred_bboxes.detach(),
-                anchor_points * stride_tensor,
-                gt_labels,
-                gt_bboxes,
-                mask_gt
-            )
+            pred_scores.detach().sigmoid(),
+            (pred_bboxes.detach() * stride_tensor).type(gt_bboxes.dtype), # 放大到像素级
+            anchor_points * stride_tensor, # 放大到像素级
+            gt_labels,
+            gt_bboxes, # 本身已经是像素级
+            mask_gt,
+        )
 
-        # 计算边界框损失
-
-        loss_bbox, loss_dfl = self.bbox_loss(
-            pred_distri, pred_bboxes, anchor_points, target_bboxes, target_scores, target_gt_idx, fg_mask, stride_tensor
-            )
-
-        # 计算分类损失
-        try:
-            if fg_mask.sum():
-                # 有前景点，正常计算分类损失
-                weight = torch.ones_like(target_scores)
-                loss_cls = F.binary_cross_entropy_with_logits(
-                    pred_scores[fg_mask],
-                    target_scores[fg_mask],
-                    weight=weight[fg_mask],
-                    reduction='none'
-                ).sum() / max(fg_mask.sum(), 1)  # ✅
-
-            else:
-                # 没有前景点，使用一个小的分类损失
-                loss_cls = torch.tensor(1.0, device=self.device, requires_grad=True)
-        except Exception as e:
-            LOGGER.error(f"计算分类损失时出错: {e}")
-            import traceback
-            LOGGER.error(traceback.format_exc())
-            loss_cls = torch.tensor(1.0, device=self.device, requires_grad=True)
+        print("🕵️  DEBUGGING INSIDE TomatoDetectWithRankLoss")
+        print(f"    pred_bboxes sample 5: {pred_bboxes[:5]}")
+        # 确保fg_mask是布尔类型
+        fg_mask = fg_mask.bool()
         
-        # 计算排序损失
-        try:
-            loss_rank = self.compute_ranking_loss(pred_h_pos_tensor, batch, fg_mask, target_gt_idx) * self.lambda_rank
-        except Exception as e:
-            LOGGER.error(f"计算排序损失时出错: {e}")
-            import traceback
-            LOGGER.error(traceback.format_exc())
-            loss_rank = torch.tensor(0.01, device=self.device, requires_grad=True)
-        
-        # 计算总损失
-        loss = loss_bbox + loss_cls + loss_dfl + loss_rank
-        
+        # 计算目标分数总和用于归一化
+        target_scores_sum = max(target_scores.sum(), 1)
 
-        
-        # 返回总损失和各损失分量
-        return loss, torch.stack((loss_bbox, loss_cls, loss_dfl, loss_rank))
-
-    def _normalize_predictions(self, preds):
-        """
-        规范化预测输入格式
-        
-        Args:
-            preds: 预测结果，可以是以下格式之一：
-                - 张量列表: [feature1, feature2, ...]
-                - 元组: (feats, pred_h_pos) 或 (NULL, feats, pred_h_pos)
-                - 字典: {"features": feats, "h_pos": pred_h_pos}
-                - Detect_Efficient_Tomato的特殊输出: (y, {"features": feats, "h_pos": h_pos})
+        # 6. 计算标准损失
+        if fg_mask.sum():
+            # 使用父类的bbox_loss计算器
+            loss[0], loss[2] = self.bbox_loss(
+                pred_distri, pred_bboxes, anchor_points, target_bboxes, target_scores, target_scores_sum, fg_mask)
                 
-        Returns:
-            feats: 特征列表
-            pred_h_pos: 高度预测，如果不存在则为None
-        """
-        feats = None
-        pred_h_pos = None
+            # 计算分类损失（模仿父类v8DetectionLoss中的实现方式）
+            cls_loss = self.bce(pred_scores, target_scores.to(dtype))  # BCE(pred_scores, target_scores)
+            loss[1] = cls_loss.sum() / target_scores_sum
         
-        LOGGER.info(f"规范化预测输入，类型: {type(preds)}")
+        # 7. 【注入自定义的 Rank Loss】
+        #    这部分逻辑现在可以安全地执行，因为 fg_mask 和 target_gt_idx 是正确的
+        pred_h_cat = torch.cat([p.view(p.shape[0], 1, -1) for p in pred_h_pos], dim=2)
+        pred_h_tensor = pred_h_cat.permute(0, 2, 1).contiguous()
         
-        # 处理字典格式（训练模式下的Detect_Efficient_Tomato输出）
-        if isinstance(preds, dict):
-            LOGGER.info(f"处理字典格式输入，包含键: {list(preds.keys())}")
-            if "features" in preds and isinstance(preds["features"], list):
-                feats = preds["features"]
-                pred_h_pos = preds.get("h_pos", None)
-                LOGGER.info(f"从字典中提取: features={type(feats)}, 特征数量={len(feats) if feats is not None else 0}")
-                LOGGER.info(f"从字典中提取: h_pos={type(pred_h_pos)}, h_pos特征数量={len(pred_h_pos) if isinstance(pred_h_pos, list) else 0}")
+        # 准备对齐的自定义真值 (这部分逻辑不变，但现在它服务于一个能正常工作的流程)
+        custom_data = torch.cat(
+            (batch['cls'].view(-1, 1).to(self.device), batch['cluster_ids'].view(-1, 1).to(self.device), batch['h_rel'].view(-1, 1).to(self.device)), 1
+        ).to(self.device)
+        custom_targets = torch.zeros(batch_size, targets.shape[1], 3, device=self.device)
+        for i in range(batch_size):
+            mask = (batch['batch_idx'] == i)
+            count = mask.sum()
+            if count > 0:
+                custom_targets[i, :count] = custom_data[mask]
         
-        # 处理元组/列表格式
-        elif isinstance(preds, (list, tuple)):
-            LOGGER.info(f"处理元组/列表格式输入，长度: {len(preds)}")
-            
-            # 推理模式下的Detect_Efficient_Tomato输出
-            if len(preds) == 2 and isinstance(preds[1], dict) and "features" in preds[1]:
-                LOGGER.info("检测到Detect_Efficient_Tomato的特殊输出格式: (y, {'features': feats, 'h_pos': h_pos})")
-                feats = preds[1].get("features")
-                pred_h_pos = preds[1].get("h_pos")
-                LOGGER.info(f"从特殊输出中提取: features={type(feats)}, 特征数量={len(feats) if isinstance(feats, list) else 0}")
-                LOGGER.info(f"从特殊输出中提取: h_pos={type(pred_h_pos)}, h_pos特征数量={len(pred_h_pos) if isinstance(pred_h_pos, list) else 0}")
-            
-            # 标准YOLO格式: [feature1, feature2, ...]
-            elif len(preds) > 0 and all(isinstance(p, torch.Tensor) for p in preds):
-                LOGGER.info("检测到标准YOLO特征列表格式")
-                feats = preds
-                
-            # 嵌套列表结构: [[tensor1, tensor2, ...], ...]
-            elif len(preds) > 0 and isinstance(preds[0], list) and len(preds[0]) > 0 and all(isinstance(x, torch.Tensor) for x in preds[0]):
-                LOGGER.info("检测到嵌套列表格式: [[tensor1, tensor2, ...], ...]")
-                feats = preds[0]
-                if len(preds) >= 2 and isinstance(preds[1], list) and all(isinstance(x, torch.Tensor) for x in preds[1]):
-                    pred_h_pos = preds[1]
-            
-            # 前导None的格式: (None, [tensor1, tensor2, ...], ...)
-            elif len(preds) > 1 and preds[0] is None and isinstance(preds[1], list):
-                LOGGER.info("检测到前导None的格式: (None, [tensor1, tensor2, ...], ...)")
-                feats = preds[1]
-                if len(preds) > 2 and isinstance(preds[2], list):
-                    pred_h_pos = preds[2]
+        # 计算 Rank Loss (lambda_rank > 0 时生效)
+        loss_rank = self.compute_ranking_loss(pred_h_tensor, custom_targets, fg_mask, target_gt_idx)
         
-        # 处理单个张量
-        elif isinstance(preds, torch.Tensor):
-            LOGGER.info("处理单个张量输入")
-            feats = [preds]
-        
-        # 验证特征是否有效
-        if feats is None:
-            LOGGER.warning(f"无法识别的预测输入格式: {type(preds)}")
-            return None, None
-            
-        if not isinstance(feats, list):
-            LOGGER.warning(f"特征不是列表类型: {type(feats)}")
-            return None, None
-            
-        if len(feats) == 0:
-            LOGGER.warning("空特征列表")
-            return None, None
-            
-        if not all(isinstance(f, torch.Tensor) for f in feats):
-            LOGGER.warning(f"特征列表包含非张量元素: {[type(f) for f in feats]}")
-            return None, None
-        
-        # 验证并打印特征信息
-        LOGGER.info(f"规范化完成，特征数量: {len(feats)}")
-        for i, feat in enumerate(feats):
-            LOGGER.info(f"特征[{i}]: 形状={feat.shape}, 类型={feat.dtype}")
-        
-        # 验证并打印h_pos信息
-        if pred_h_pos is not None and isinstance(pred_h_pos, list) and len(pred_h_pos) > 0:
-            LOGGER.info(f"h_pos特征数量: {len(pred_h_pos)}")
-            for i, h_pos in enumerate(pred_h_pos):
-                if isinstance(h_pos, torch.Tensor):
-                    LOGGER.info(f"h_pos[{i}]: 形状={h_pos.shape}, 类型={h_pos.dtype}")
-                else:
-                    LOGGER.warning(f"h_pos[{i}]不是张量: {type(h_pos)}")
-        
-        return feats, pred_h_pos
-    
-    def _extract_predictions(self, feats):
-        """
-        从特征中提取预测分布和分数
-        
-        Args:
-            feats: 特征列表
-            
-        Returns:
-            pred_distri: 预测分布
-            pred_scores: 预测分数
-        """
-        try:
-            # 特征拼接前获取批次大小和通道数
-            batch_size = feats[0].shape[0]
-            total_channels = feats[0].shape[1]
-            
-            # 打印通道数信息
-            LOGGER.info(f"特征通道数: {total_channels}, self.no: {self.no}")
-            
-            # 检查通道数是否匹配
-            if total_channels > self.no:
-                LOGGER.warning(f"通道数不匹配: 特征通道数={total_channels}, self.no={self.no}, 可能缺少高度预测通道")
-                LOGGER.warning(f"假设特征形式为: 4*reg_max(box) + nc(class) + 额外高度通道, 检查通道数是否为 {4*self.reg_max + self.nc + 1}")
-                
-                # 计算预期通道数
-                expected_box_channels = 4 * self.reg_max  # 边界框通道
-                expected_cls_channels = self.nc  # 类别通道
-                expected_h_pos_channels = 1  # 高度通道
-                expected_total = expected_box_channels + expected_cls_channels + expected_h_pos_channels
-                
-                if total_channels == expected_total:
-                    LOGGER.info(f"通道数符合预期: {expected_total} = {expected_box_channels}(box) + {expected_cls_channels}(class) + {expected_h_pos_channels}(h_pos)")
-                    
-                    # 拼接特征并正确分割
-                    features_cat = torch.cat([xi.view(batch_size, total_channels, -1) for xi in feats], 2)
-                    pred_distri = features_cat[:, :expected_box_channels]
-                    pred_scores = features_cat[:, expected_box_channels:expected_box_channels+expected_cls_channels]
-                    
-                    # 调整维度顺序
-                    pred_scores = pred_scores.permute(0, 2, 1).contiguous()
-                    pred_distri = pred_distri.permute(0, 2, 1).contiguous()
-                    
-                    LOGGER.info(f"调整后: pred_distri: {pred_distri.shape}, pred_scores: {pred_scores.shape}")
-                    return pred_distri, pred_scores
-            
-            # 原始方法 - 只考虑 self.no 通道
-            LOGGER.info(f"使用默认方法提取预测，特征视图使用 self.no={self.no} 通道")
-            pred_distri, pred_scores = torch.cat([xi.view(batch_size, self.no, -1) for xi in feats], 2).split(
-            (self.reg_max * 4, self.nc), 1)
-            
-            LOGGER.info(f"pred_distri: {pred_distri.shape}, pred_scores: {pred_scores.shape}")
-            # 调整维度顺序
-            pred_scores = pred_scores.permute(0, 2, 1).contiguous()
-            pred_distri = pred_distri.permute(0, 2, 1).contiguous()
-            LOGGER.info(f"调整后: pred_distri: {pred_distri.shape}, pred_scores: {pred_scores.shape}")
-            print(f"pred_score sample :{pred_scores[0]} ")
-            return pred_distri, pred_scores
-        except Exception as e:
-            LOGGER.error(f"提取预测时出错: {e}")
-            import traceback
-            LOGGER.error(traceback.format_exc())
-            raise
-    
+        # 8. 计算总损失
+        loss_total = (loss[0] + loss[1] + loss[2]) + loss_rank * self.lambda_rank
 
+        return loss_total, torch.cat((loss, loss_rank.unsqueeze(0))).detach()
 
-            
-    def compute_ranking_loss(self, pred_h, batch, fg_mask, target_gt_idx):
+    def compute_ranking_loss(self, pred_h, custom_targets, fg_mask, target_gt_idx):
         """
         Computes ranking loss using a vectorized approach to prevent hanging.
         """
+        batch_size = pred_h.shape[0]
+        device = pred_h.device
+        
+        # 确保fg_mask是布尔类型
+        fg_mask = fg_mask.bool()
         
         if fg_mask.sum() == 0:
             return torch.tensor(0.0, device=self.device)
 
         # Get aligned predictions and ground truths for positive anchors
         positive_pred_h = pred_h[fg_mask] # Shape: [num_pos]
-        gt_indices = target_gt_idx[fg_mask]
-        gt_cluster_ids = batch['cluster_ids'].flatten().to(self.device)[gt_indices]
-        gt_h_rel = batch['h_rel'].flatten().to(self.device)[gt_indices]
-        gt_classes = batch['cls'].flatten().to(self.device)[gt_indices]
-        
+        assigned_gt_indices = target_gt_idx[fg_mask]
+        batch_idx_grid = torch.arange(batch_size, device=device).view(batch_size, 1).repeat(1, pred_h.shape[1])
+        positive_batch_idx = batch_idx_grid[fg_mask] # 得到 [num_pos]
+        aligned_gts = custom_targets[positive_batch_idx, assigned_gt_indices]
+        gt_classes = aligned_gts[:, 0]
+        gt_cluster_ids = aligned_gts[:, 1]
+        gt_h_rel = aligned_gts[:, 2]
+
         unique_clusters = torch.unique(gt_cluster_ids)
         final_loss = torch.tensor(0.0, device=self.device)
         total_pairs = 0
@@ -1412,10 +1200,7 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
             # Find all items belonging to the current cluster
             cluster_mask = gt_cluster_ids == cluster_id
             n_tomatoes = cluster_mask.sum()
-            print(f"number of tomatos to compair:{n_tomatoes}")
-
             if n_tomatoes < 2:
-                print("不足两个")
                 continue
                 
             # Get the data for the current cluster
@@ -1436,24 +1221,49 @@ class TomatoDetectWithRankLoss(v8DetectionLoss):
             # --- VECTORIZED LOSS CALCULATION ---
             # Create a target tensor: 1 if h_gt1 < h_gt2, -1 if h_gt2 < h_gt1, 0 otherwise
             target = torch.sign(h_gt2 - h_gt1)
-
+            base_margin = 0.2
+            dynamic_margin = base_margin + self.margin * torch.abs(h_gt1 - h_gt2)
             # Calculate base ranking loss for all pairs at once
             # margin_ranking_loss wants to make pred1 > pred2 for target=1
-            loss = F.margin_ranking_loss(h_pred1, h_pred2, target, margin=self.margin, reduction='none')
+            loss = torch.clamp_min(-target * (h_pred2 - h_pred1) + dynamic_margin, 0)
+            regression_loss = F.smooth_l1_loss(cluster_pred_h.squeeze(-1), cluster_gt_h, reduction='mean') * 5.0
             
-            # --- VECTORIZED HEAVY PENALTY ---
-            # Create masks for the special penalty condition
-            # Condition 1: model wrongly predicts h1 lower (h_pred1 >= h_pred2) AND GT is h_gt1 < h_gt2 AND classes match
-            penalty_mask1 = (h_pred1 >= h_pred2) & (target == 1) & (cls1 == 0) & (cls2 == 1)
-            # Condition 2: model wrongly predicts h2 lower (h_pred2 >= h_pred1) AND GT is h_gt2 < h_gt1 AND classes match
-            penalty_mask2 = (h_pred2 >= h_pred1) & (target == -1) & (cls2 == 0) & (cls1 == 1)
-            
-            # Create penalty multipliers (2.0 where condition is met, 1.0 otherwise)
-            penalty_factor = torch.ones_like(loss)
-            penalty_factor[penalty_mask1 | penalty_mask2] = 2.0 # Use heavy_penalty_factor from __init__ if you prefer
-            
-            # Apply penalty and sum up the loss for this cluster
-            final_loss += (loss * penalty_factor).sum()
+            # --- 可导的重惩罚项 ---
+
+            # 定义一个超参数 k 来控制 sigmoid 的陡峭程度。k越大，函数越接近一个硬性开关。
+            # 这是一个需要根据实验效果调整的超参数。
+            k = 10.0 
+
+            # 基础惩罚：给所有样本的损失都乘以一个基础权重 (例如 2.0)
+            # 原来的 penalty_factor 是 2.0 和 5.0，所以额外惩罚是 3.0
+            base_penalty_factor = 2.0
+            heavy_penalty_additive = 3.0 # 5.0 - 2.0
+
+            penalized_loss = loss * base_penalty_factor
+
+            # 条件1: GT 要求 h1 < h2 (target=1)，但模型错误地预测 h1 >= h2
+            # 我们只在需要重惩罚的类别组合上应用 (cls1=0, cls2=1)
+            heavy_penalty_mask1 = (target == 1) & (cls1 == 0) & (cls2 == 1)
+
+            # 计算"错误程度"分数：h_pred1 相对于 h_pred2 大了多少
+            # sigmoid(k * (h_pred1 - h_pred2)) 会在 h_pred1 > h_pred2 时趋近于1
+            wrongness_score1 = torch.sigmoid(k * (h_pred1 - h_pred2))
+
+            # 计算可导的额外惩罚值
+            # 只在满足条件 (heavy_penalty_mask1) 的样本上，施加与"错误程度"成正比的惩罚
+            additional_penalty1 = heavy_penalty_additive * wrongness_score1 * heavy_penalty_mask1
+
+
+            # 条件2: GT 要求 h2 < h1 (target=-1)，但模型错误地预测 h2 >= h1
+            heavy_penalty_mask2 = (target == -1) & (cls2 == 0) & (cls1 == 1)
+            wrongness_score2 = torch.sigmoid(k * (h_pred2 - h_pred1))
+            additional_penalty2 = heavy_penalty_additive * wrongness_score2 * heavy_penalty_mask2
+
+
+            # --- 更新 Final Loss ---
+            # 将基础惩罚损失、可导的额外惩罚、回归损失相加
+            # 注意，这里我们将惩罚项直接加到 loss 上，而不是作为系数
+            final_loss += (penalized_loss + additional_penalty1 + additional_penalty2).sum() + regression_loss * n_tomatoes
             total_pairs += len(p1_idx)
 
         # Normalize the total loss

@@ -626,41 +626,6 @@ class BaseTrainer:
         if self.ema:
             self.ema.update(self.model)
 
-    def preprocess_batch(self, batch):
-        """Allows custom preprocessing model inputs and ground truths depending on task type."""
-        # 检查批次是否为空或缺少关键字段
-        if batch is None or not isinstance(batch, dict) or 'img' not in batch:
-            LOGGER.warning("批次无效或缺少'img'字段")
-            return batch
-            
-        # 检查是否缺少边界框和标签
-        if 'bboxes' in batch and isinstance(batch['bboxes'], torch.Tensor) and batch['bboxes'].shape[0] == 0:
-            LOGGER.warning("批次中没有边界框，处理空批次...")
-            # 对于空批次，创建一个假的标签以避免错误，但设置为不参与损失计算
-            if 'img' in batch and isinstance(batch['img'], torch.Tensor):
-                bs = batch['img'].shape[0]  # 批次大小
-                device = batch['img'].device
-                # 创建假边界框和类别
-                fake_bboxes = torch.zeros((1, 4), device=device)  # 一个空边界框
-                fake_cls = torch.zeros((1,), device=device)  # 一个类别为0的标签
-                fake_batch_idx = torch.zeros((1,), device=device)  # 批次索引为0
-                
-                # 如果是番茄数据集，添加番茄特有字段
-                if 'cluster_ids' in batch:
-                    fake_cluster_ids = torch.zeros((1, 1), device=device)
-                    batch['cluster_ids'] = fake_cluster_ids
-                if 'h_rel' in batch:
-                    fake_h_rel = torch.zeros((1, 1), device=device)
-                    batch['h_rel'] = fake_h_rel
-                    
-                # 更新批次
-                batch['bboxes'] = fake_bboxes
-                batch['cls'] = fake_cls
-                batch['batch_idx'] = fake_batch_idx
-                LOGGER.info("已添加假边界框，以避免空批次错误")
-            
-        return batch
-
     def validate(self):
         """
         Runs validation on test set using self.validator.

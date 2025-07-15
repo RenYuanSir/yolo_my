@@ -1362,21 +1362,111 @@ class TomatoMetrics(DetMetrics):
             except Exception as e:
                 LOGGER.warning(f"Could not compute h_pos metrics: {e}")
 
-    def update_h_pos_stats(self, tp, conf, pred_h, target_h):
+    def update_h_pos_stats(self, tp, conf, pred_h, target_h, cluster_ids=None):
         """
-        Update h_pos statistics for batch processing.
+        按照cluster_ids对番茄进行分组后计算排序准确率
         
         Args:
             tp (torch.Tensor): True positive detections for h_pos.
             conf (torch.Tensor): Confidence scores for h_pos.
             pred_h (torch.Tensor): Predicted h_pos values.
             target_h (torch.Tensor): Target h_pos values.
+            cluster_ids (torch.Tensor, optional): Cluster IDs for each tomato.
         """
-        if len(tp) > 0:
-            self.h_pos_stats['tp'].append(tp)
-            self.h_pos_stats['conf'].append(conf)
-            self.h_pos_stats['pred_h'].append(pred_h)
-            self.h_pos_stats['target_h'].append(target_h)
+        if len(pred_h) > 0 and len(target_h) > 0:
+            # 确保所有张量都是一维的
+            if pred_h.dim() > 1:
+                pred_h = pred_h.squeeze()
+            if target_h.dim() > 1:
+                target_h = target_h.squeeze()
+                
+            # 处理cluster_ids的维度问题
+            has_valid_clusters = False
+            if cluster_ids is not None:
+                # 检查是否为0维张量(标量)
+                if cluster_ids.dim() == 0:
+                    # 将0维张量转换为包含单个元素的1维张量
+                    cluster_ids = cluster_ids.unsqueeze(0)
+                    # 如果只有一个番茄，无法计算排序准确率
+                    has_valid_clusters = False
+                elif cluster_ids.dim() > 1:
+                    cluster_ids = cluster_ids.squeeze()
+                    has_valid_clusters = len(cluster_ids) > 1
+                else:
+                    has_valid_clusters = len(cluster_ids) > 1
+            
+            # 计算当前batch的MAE (仍然使用所有样本计算)
+            batch_mae = torch.mean(torch.abs(pred_h - target_h)).item()
+            
+            # 初始化累计正确排序对数和总排序对数
+            total_correct_pairs = 0
+            total_pairs = 0
+            
+            # 如果有有效的cluster_ids信息，按cluster分组计算
+            if has_valid_clusters and len(cluster_ids) == len(pred_h):
+                try:
+                    # 获取所有唯一的cluster_id
+                    unique_clusters = torch.unique(cluster_ids)
+                    
+                    for cluster_id in unique_clusters:
+                        if cluster_id < 0:  # 跳过无效的cluster_id
+                            continue
+                        
+                        # 找到属于当前cluster的番茄
+                        cluster_mask = cluster_ids == cluster_id
+                        n_tomatoes = cluster_mask.sum().item()
+                        
+                        # 只有当cluster内有至少2个番茄时才能计算排序
+                        if n_tomatoes < 2:
+                            continue
+                        
+                        # 安全地选择当前cluster的预测和真实高度
+                        cluster_pred_h = pred_h[cluster_mask]
+                        cluster_target_h = target_h[cluster_mask]
+                        
+                        # 按真实高度排序
+                        sorted_indices = torch.argsort(cluster_target_h)
+                        pred_sorted = cluster_pred_h[sorted_indices]
+                        
+                        # 计算正确排序的对数
+                        correct_order = (pred_sorted[1:] >= pred_sorted[:-1]).sum().item()
+                        cluster_pairs = n_tomatoes - 1
+                        
+                        # 累加到总计数中
+                        total_correct_pairs += correct_order
+                        total_pairs += cluster_pairs
+                except Exception as e:
+                    # 如果出错，记录日志并回退到不使用cluster_ids的方法
+                    LOGGER.warning(f"按cluster计算排序准确率时出错: {e}")
+                    has_valid_clusters = False
+            
+            # 如果没有有效的cluster_ids或处理出错，使用整体排序方法
+            if not has_valid_clusters and len(pred_h) > 1:
+                sorted_indices = torch.argsort(target_h)
+                pred_sorted = pred_h[sorted_indices]
+                total_correct_pairs = (pred_sorted[1:] >= pred_sorted[:-1]).sum().item()
+                total_pairs = len(pred_sorted) - 1
+            
+            # 计算排序准确率
+            batch_rank_acc = total_correct_pairs / max(total_pairs, 1)
+            
+            # 增量更新统计数据
+            if 'total_samples' not in self.h_pos_stats:
+                self.h_pos_stats['total_samples'] = 0
+                self.h_pos_stats['sum_mae'] = 0.0
+                self.h_pos_stats['sum_rank_acc'] = 0.0
+                self.h_pos_stats['total_batches'] = 0
+            
+            # 更新累积值
+            n_samples = len(pred_h)
+            self.h_pos_stats['total_samples'] += n_samples
+            self.h_pos_stats['sum_mae'] += batch_mae * n_samples
+            self.h_pos_stats['sum_rank_acc'] += batch_rank_acc
+            self.h_pos_stats['total_batches'] += 1
+            
+            # 实时计算平均值
+            self.h_pos_stats['h_mae'] = self.h_pos_stats['sum_mae'] / self.h_pos_stats['total_samples']
+            self.h_pos_stats['rank_acc'] = self.h_pos_stats['sum_rank_acc'] / self.h_pos_stats['total_batches']
 
     @property
     def keys(self):
@@ -1416,40 +1506,21 @@ class TomatoMetrics(DetMetrics):
         return dict(zip(self.keys + ["fitness"], self.mean_results() + [self.fitness]))
 
     def finalize_h_pos_metrics(self):
-        """Finalize h_pos metrics calculation from accumulated statistics."""
-        try:
-            if self.h_pos_stats['tp'] and len(self.h_pos_stats['tp']) > 0:
-                tp = torch.cat(self.h_pos_stats['tp']) if len(self.h_pos_stats['tp']) else torch.zeros(0)
-                conf = torch.cat(self.h_pos_stats['conf']) if len(self.h_pos_stats['conf']) else torch.zeros(0)
-                pred_h = torch.cat(self.h_pos_stats['pred_h']) if len(self.h_pos_stats['pred_h']) else torch.zeros(0)
-                target_h = torch.cat(self.h_pos_stats['target_h']) if len(self.h_pos_stats['target_h']) else torch.zeros(0)
-                
-                if len(pred_h) > 0 and len(target_h) > 0:
-                    # Calculate h_pos MAE
-                    h_mae = torch.mean(torch.abs(pred_h - target_h)).item()
-                    self.h_pos_stats['h_mae'] = h_mae
-                    
-                    # Calculate ranking accuracy
-                    if len(pred_h) > 1:
-                        sorted_indices = torch.argsort(target_h)
-                        pred_sorted = pred_h[sorted_indices]
-                        
-                        correct_order = (pred_sorted[1:] >= pred_sorted[:-1]).sum()
-                        total_pairs = len(pred_sorted) - 1
-                        
-                        if total_pairs > 0:
-                            rank_acc = (correct_order / total_pairs).item()
-                            self.h_pos_stats['rank_acc'] = rank_acc
-                        else:
-                            self.h_pos_stats['rank_acc'] = 0.0
-                    else:
-                        self.h_pos_stats['rank_acc'] = 0.0
-                        
-        except Exception as e:
-            LOGGER.warning(f"Could not finalize h_pos metrics: {e}")
+        """完成h_pos指标计算，检查是否已有计算结果"""
+        # 如果没有处理过任何数据，初始化为0
+        if 'h_mae' not in self.h_pos_stats:
             self.h_pos_stats['h_mae'] = 0.0
+        if 'rank_acc' not in self.h_pos_stats:
             self.h_pos_stats['rank_acc'] = 0.0
 
     def reset_h_pos_stats(self):
         """Reset h_pos statistics."""
-        self.h_pos_stats = {'tp': [], 'conf': [], 'pred_h': [], 'target_h': []}
+        self.h_pos_stats = {
+        'h_mae': 0.0, 
+        'rank_acc': 0.0, 
+        'total_samples': 0,
+        'sum_mae': 0.0,
+        'sum_rank_acc': 0.0,
+        'total_batches': 0,
+        'total_clusters': 0
+    }

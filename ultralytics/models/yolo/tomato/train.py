@@ -10,6 +10,7 @@ from ultralytics.nn.tasks import TomatoDetectionModel
 from ultralytics.utils import LOGGER
 from ultralytics.models import yolo
 from copy import copy
+from ultralytics.utils.torch_utils import de_parallel, torch_distributed_zero_first
 from ultralytics.utils.loss import TomatoDetectWithRankLoss
 
 LOGGER = logging.getLogger(__name__)
@@ -73,7 +74,39 @@ class TomatoTrainer(DetectionTrainer):
         trainer.train()
         ```
     """
+    def build_dataset(self, img_path, mode="train", batch=None):
+        """构建番茄检测专用数据集"""
+        from ultralytics.data import build_yolo_dataset
+        
+        gs = max(int(de_parallel(self.model).stride.max() if self.model else 0), 32)
+        return build_yolo_dataset(self.args, img_path, batch, self.data, mode=mode, rect=mode == "val", stride=gs)
 
+    def get_dataloader(self, dataset_path, batch_size=16, rank=0, mode="train"):
+        """返回使用TomatoYOLODataset.collate_fn的数据加载器"""
+        from ultralytics.data import build_dataloader
+        
+        assert mode in {"train", "val"}, f"Mode必须是'train'或'val'，而不是{mode}。"
+        with torch_distributed_zero_first(rank):  # 仅在DDP中初始化数据集缓存一次
+            dataset = self.build_dataset(dataset_path, mode, batch_size)
+        shuffle = mode == "train"
+        if getattr(dataset, "rect", False) and shuffle:
+            LOGGER.warning("警告 ⚠️ 'rect=True'与DataLoader的shuffle不兼容，设置shuffle=False")
+            shuffle = False
+        workers = self.args.workers if mode == "train" else self.args.workers * 2
+        return build_dataloader(dataset, batch_size, workers, shuffle, rank)
+    
+    def preprocess_batch(self, batch):
+        """处理番茄检测特有的批次数据"""
+        # 首先调用父类方法处理基本图像
+        batch = super().preprocess_batch(batch)
+        
+        # 确保cluster_ids和h_rel在需要时被传输到正确设备
+        for key in ['cluster_ids', 'h_rel']:
+            if key in batch and isinstance(batch[key], torch.Tensor):
+                batch[key] = batch[key].to(self.device, non_blocking=True)
+        
+        return batch
+    
     def get_model(self, cfg=None, weights=None, verbose=True):
         """返回一个番茄检测模型。"""
         model = TomatoDetectionModel(cfg, nc=self.data["nc"], verbose=verbose)

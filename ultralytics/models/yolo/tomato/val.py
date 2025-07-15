@@ -76,25 +76,7 @@ class TomatoValidator(DetectionValidator):
         
         # 检查边界框是否为归一化坐标，如果是则转换为像素级坐标
         if 'bboxes' in batch and batch['bboxes'].numel() > 0:
-            # 检查是否是归一化坐标（最大值<=1.0）
-            if batch['bboxes'].max() <= 1.0:
-                # 获取图像尺寸
-                img_size = batch['img'].shape[2:]  # (h, w)
-                # 将归一化坐标转换为像素级坐标
-                # 注意：边界框格式为xywh，所以x,w对应宽度，y,h对应高度
-                scale_factor = torch.tensor([img_size[1], img_size[0], img_size[1], img_size[0]], 
-                                           device=batch['bboxes'].device)
-                batch['bboxes'] = batch['bboxes'] * scale_factor
-                
-                # =================== CHECKPOINT VALIDATE ===================
-                print("\n" + "="*50)
-                print("🎯 CHECKPOINT VALIDATE: 边界框坐标转换")
-                print(f"    图像尺寸: {img_size}")
-                print(f"    转换前边界框范围: [0, 1]")
-                print(f"    转换后边界框范围: [{batch['bboxes'].min().item():.4f}, {batch['bboxes'].max().item():.4f}]")
-                print(f"    边界框形状: {batch['bboxes'].shape}")
-                print("="*50 + "\n")
-                # ====================================================
+            batch['bboxes'] = batch['bboxes'].to(self.device)
             
         # 检查批次是否为空
         if 'bboxes' in batch and batch['bboxes'].shape[0] == 0:
@@ -143,26 +125,6 @@ class TomatoValidator(DetectionValidator):
             # 获取损失函数
             loss_fn = getattr(model, 'loss', None)
             
-            # =================== CHECKPOINT VALIDATE ===================
-            print("\n" + "="*50)
-            print("🎯 CHECKPOINT VALIDATE: Loss Calculation")
-            if 'bboxes' in batch and batch['bboxes'].numel() > 0:
-                print(f"    batch['bboxes'] shape: {batch['bboxes'].shape}")
-                # 判断是归一化坐标还是像素坐标
-                if batch['bboxes'].max() > 1.0:
-                    print(f"    batch['bboxes'] 格式: xywh (像素级)")
-                else:
-                    print(f"    batch['bboxes'] 格式: xywh (归一化)")
-                print(f"    batch['bboxes'] 范围: [{batch['bboxes'].min().item():.4f}, {batch['bboxes'].max().item():.4f}]")
-            
-            if isinstance(preds, dict):
-                print(f"    preds keys: {list(preds.keys())}")
-            
-            print(f"    当前模型任务类型: {getattr(model, 'task', 'unknown')}")
-            print(f"    模型类型: {type(model).__name__}")
-            print(f"    损失函数类型: {type(loss_fn).__name__ if loss_fn else 'None'}")
-            print("="*50 + "\n")
-            # ====================================================
             
             # 设置模型任务为tomato
             original_task = getattr(model, 'task', None)
@@ -193,12 +155,7 @@ class TomatoValidator(DetectionValidator):
                 # 直接传入模型的损失函数
                 loss = model.loss(batch, preds)
                 
-                # =================== CHECKPOINT VALIDATE ===================
-                print("\n" + "="*50)
-                print("🎯 CHECKPOINT VALIDATE: Loss Result")
-                print(f"    loss计算成功: {loss}")
-                print("="*50 + "\n")
-                # ====================================================
+               
                 
                 # 解包损失
                 if isinstance(loss, tuple) and len(loss) >= 2:
@@ -206,7 +163,6 @@ class TomatoValidator(DetectionValidator):
                     loss = loss[0]
                 else:
                     loss_items = torch.zeros(3, device=self.device)  # box, cls, dfl
-                print(f"    loss_items: {loss_items.tolist()}")
                 # 返回损失
                 return loss, loss_items
             except Exception as e:
@@ -395,11 +351,11 @@ class TomatoValidator(DetectionValidator):
         # 1. 从模型原始输出中提取预解码的 'y' 张量
         # 在验证阶段，preds 通常是 (y, other_data) 的元组
         y = preds[0] if isinstance(preds, (list, tuple)) else preds
-        print(f"🔍 DEBUG: y complete sample: {y[0][0]}")
+       
 
         # 2. 调用新的辅助函数，将 'y' 转换为 NMS 所需的格式
         detections = self._convert_output_for_nms(y)
-        print(f"🔍 DEBUG: detections complete sample: {detections[0][0]}")
+        
         # 如果转换失败，返回空结果
         if detections is None:
             batch_size = y.shape[0]
@@ -408,7 +364,6 @@ class TomatoValidator(DetectionValidator):
             conf_threshold = self.args.conf.item() if isinstance(self.args.conf, torch.Tensor) else self.args.conf
             iou_threshold = self.args.iou.item() if isinstance(self.args.iou, torch.Tensor) else self.args.iou
             if detections is not None:
-                print("检测到预解码的检测结果，直接应用自定义NMS")
                 # 应用自定义NMS处理
                 processed = self.custom_nms(
                     detections,
@@ -420,17 +375,6 @@ class TomatoValidator(DetectionValidator):
                     multi_label=True
                 )
                 
-                # 打印调试信息
-                print("\n" + "="*50)
-                print("🎯 CHECKPOINT VALIDATE: 预解码检测结果处理")
-                for i, p in enumerate(processed):
-                    if len(p) > 0:
-                        print(f"    processed[{i}] shape: {p.shape}")
-                        print(f"    processed[{i}] format: xywh + conf + cls + h_pos")
-                        print(f"    processed[{i}] 范围: [{p[:, :4].min().item():.4f}, {p[:, :4].max().item():.4f}]")
-                    else:
-                        print(f"    processed[{i}] 为空")
-                print("="*50 + "\n")
                 
                 return processed
             
@@ -525,7 +469,6 @@ class TomatoValidator(DetectionValidator):
 
             # 加载数据集
             self.data = check_det_dataset(self.args.data)  # 使用检测数据集检查器
-            LOGGER.info(f"Validating tomato detection model on {self.args.data}")
 
             if self.device.type in {"cpu", "mps"}:
                 self.args.workers = 0  # faster CPU val as time dominated by inference, not dataloading
@@ -558,8 +501,6 @@ class TomatoValidator(DetectionValidator):
             with dt[1]:
                 # 模型推理 - 直接使用模型输出，不再执行格式转换
                 preds = model(batch["img"], augment=augment)
-                print(f"🔍 DEBUG: preds 类型: {type(preds)}")
-                print(f"🔍 DEBUG: what is in preds: {type(preds[0])}")
             # Loss
             with dt[2]:
                 if self.training:
@@ -645,11 +586,11 @@ class TomatoValidator(DetectionValidator):
                 if npr == 0:
                     if nl:
                         # 使用append方法更新统计信息，确保使用PyTorch张量
-                        self.stats['tp'].append(torch.zeros(0, self.niou, dtype=torch.bool, device=self.device))
-                        self.stats['conf'].append(torch.zeros(0, device=self.device))
-                        self.stats['pred_cls'].append(torch.zeros(0, device=self.device))
-                        self.stats['target_cls'].append(stat["target_cls"])  # 已经是PyTorch张量
-                        self.stats['target_img'].append(stat["target_img"])  # 添加target_img
+                        self.stats['tp'].append([]) # 存储空列表
+                        self.stats['conf'].append([]) # 存储空列表
+                        self.stats['pred_cls'].append([]) # 存储空列表
+                        self.stats['target_cls'].append(stat["target_cls"].detach().cpu().tolist())
+                        self.stats['target_img'].append(stat["target_img"].detach().cpu().tolist())
                         
                         if self.args.plots:
                             # bbox已经是xyxy格式
@@ -666,17 +607,6 @@ class TomatoValidator(DetectionValidator):
                 stat["conf"] = predn[:, 4]
                 stat["pred_cls"] = predn[:, 5]
 
-                # =================== CHECKPOINT VALIDATE ===================
-                print("\n" + "="*50)
-                print("🎯 CHECKPOINT VALIDATE: IoU计算前的格式检查")
-                print(f"    bbox (GT) 格式: xyxy (像素), 形状: {bbox_xyxy.shape}")
-                print(f"    bbox value sample: {bbox[:5]}")
-                print(f"    bbox 范围: [{bbox.min().item():.4f}, {bbox.max().item():.4f}]")
-                print(f"    predn (Pred) 格式: xyxy[:4] + conf + cls + h_pos, 形状: {predn.shape}")
-                print(f"    predn[:, :4] 范围: [{predn[:, :4].min().item():.4f}, {predn[:, :4].max().item():.4f}]")
-                print(f"    predn[:, :4] sample: {predn[:, :4][:5]}")
-                print("="*50 + "\n")
-                # ====================================================
                 
                 # 计算IoU
                 iou = box_iou(bbox_xyxy, predn[:, :4])  
@@ -686,14 +616,7 @@ class TomatoValidator(DetectionValidator):
                     print(f"警告: IoU计算结果包含NaN值，将替换为0")
                     iou = torch.nan_to_num(iou, nan=0.0)
                 
-                # =================== CHECKPOINT VALIDATE ===================
-                print("\n" + "="*50)
-                print("🎯 CHECKPOINT VALIDATE: IoU计算结果")
-                print(f"    IoU矩阵形状: {iou.shape}")
-                print(f"    IoU范围: [{iou.min().item():.4f}, {iou.max().item():.4f}]")
-                print(f"    IoU包含NaN: {torch.isnan(iou).any().item()}")
-                print("="*50 + "\n")
-                # ====================================================
+               
                 
                 # 根据IoU值分配预测框和真实框
                 correct = np.zeros((npr, self.niou), dtype=bool)  # init
@@ -721,69 +644,50 @@ class TomatoValidator(DetectionValidator):
                 
                 # 更新统计信息
                 # 使用append方法而不是索引赋值
-                self.stats['tp'].append(correct_tensor)  # 使用torch.Tensor
-                self.stats['conf'].append(predn[:, 4])
-                self.stats['pred_cls'].append(predn[:, 5])
-                self.stats['target_cls'].append(stat["target_cls"])
-                self.stats['target_img'].append(stat["target_img"])  # 确保添加target_img
+                self.stats['tp'].append(correct.tolist()) # 直接使用numpy数组转换
+                self.stats['conf'].append(stat["conf"].detach().cpu().tolist())
+                self.stats['pred_cls'].append(stat["pred_cls"].detach().cpu().tolist())
+                self.stats['target_cls'].append(stat["target_cls"].detach().cpu().tolist())
+                self.stats['target_img'].append(stat["target_img"].detach().cpu().tolist())
 
                 # 处理h_pos特定指标
                 if len(pred) > 0 and pred.shape[1] > 6:  # 确保有h_pos预测
                     h_pos_pred = pred[:, 6]
+                    print(f"h_pos_pred: {h_pos_pred}")
                     if nl:
                         try:
                             # 匹配检测和真实框
                             max_iou, max_idx = iou.max(0)
                             matched = max_iou > 0.5
                             
-                            # =================== CHECKPOINT VALIDATE ===================
-                            print("\n" + "="*50)
-                            print("🎯 CHECKPOINT VALIDATE: H_pos Metrics")
-                            print(f"    h_pos_pred: {h_pos_pred}")
-                            print(f"    matched: {matched.sum().item()}/{len(matched)}")
-                            print(f"    batch中是否有h_rel: {'h_rel' in batch}")
-                            if 'h_rel' in batch:
-                                h_rel_batch = batch['h_rel']
-                                print(f"    h_rel_batch类型: {type(h_rel_batch)}")
-                                if isinstance(h_rel_batch, list):
-                                    print(f"    h_rel_batch是列表，长度: {len(h_rel_batch)}")
-                                    if si < len(h_rel_batch):
-                                        print(f"    h_rel_batch[{si}]类型: {type(h_rel_batch[si])}")
-                                        print(f"    h_rel_batch[{si}]形状: {h_rel_batch[si].shape if hasattr(h_rel_batch[si], 'shape') else 'no shape'}")
-                                else:
-                                    print(f"    h_rel_batch形状: {h_rel_batch.shape}")
-                                    print(f"    batch_idx中si={si}的数量: {(batch['batch_idx'] == si).sum().item()}")
-                            print("="*50 + "\n")
-                            # ====================================================
                             
                             # 检查batch中是否有h_rel字段
                             if matched.sum() > 0 and 'h_rel' in batch:
                                 # 对于tomato任务，数据集collate_fn提供了h_rel字段
                                 h_rel_batch = batch['h_rel']
+                                cluster_ids_batch = batch.get('cluster_ids', None)
                                 if isinstance(h_rel_batch, list):
                                     if si < len(h_rel_batch):
                                         h_rel_true = h_rel_batch[si][max_idx[matched]]
-                                        # 使用TomatoMetrics的update_h_pos_stats方法
-                                        self.metrics.update_h_pos_stats(
-                                            matched[matched], 
-                                            pred[matched, 4], 
-                                            h_pos_pred[matched], 
-                                            h_rel_true
-                                        )
+                                        cluster_ids_true = cluster_ids_batch[si][max_idx[matched]] if cluster_ids_batch is not None else torch.tensor([])
                                 else:
                                     # 如果是tensor，需要找到对应si的所有h_rel
-                                    idx = batch["batch_idx"] == si
-                                    if idx.any():
-                                        h_idx = batch["batch_idx"] == si
-                                        if len(h_rel_batch[h_idx]) > 0:
-                                            h_rel_true = h_rel_batch[h_idx][max_idx[matched]]
-                                            # 使用TomatoMetrics的update_h_pos_stats方法
-                                            self.metrics.update_h_pos_stats(
-                                                matched[matched], 
-                                                pred[matched, 4], 
-                                                h_pos_pred[matched], 
-                                                h_rel_true
-                                            )
+                                    h_idx = batch["batch_idx"] == si
+                                    if h_idx.any() and len(h_rel_batch[h_idx]) > 0:
+                                        h_rel_true = h_rel_batch[h_idx][max_idx[matched]].detach().cpu()
+                                        cluster_ids_true = cluster_ids_batch[h_idx][max_idx[matched]].detach().cpu()
+                                    else:
+                                        h_rel_true = torch.tensor([])
+                                        cluster_ids_true = torch.tensor([])
+                                if cluster_ids_true is not None and cluster_ids_true.dim() > 1:
+                                    cluster_ids_true = cluster_ids_true.squeeze()
+                                self.metrics.update_h_pos_stats(
+                                tp=matched[matched].detach().cpu(), 
+                                conf=pred[matched, 4].detach().cpu(), 
+                                pred_h=h_pos_pred[matched].detach().cpu(), 
+                                target_h=h_rel_true,
+                                cluster_ids=cluster_ids_true
+                            )
                         except Exception as e:
                             LOGGER.warning(f"处理h_pos指标时出错: {e}")
                             import traceback
@@ -800,45 +704,44 @@ class TomatoValidator(DetectionValidator):
         这个版本正确地将番茄特定指标与父类中的标准指标合并。
         """
         try:
-            # 确保stats字典包含所有必要的键
-            if 'target_img' not in self.stats:
-                LOGGER.warning("警告: stats字典中缺少'target_img'键，使用空列表")
-                self.stats['target_img'] = []
-                
-            # 检查是否有任何空列表，如果有，添加占位符避免错误
-            for k in ['tp', 'conf', 'pred_cls', 'target_cls', 'target_img']:
-                if len(self.stats[k]) == 0:
-                    LOGGER.warning(f"警告: stats['{k}']为空，添加占位符")
-                    self.stats[k] = [torch.zeros(1, device=self.device)]
+            # 1. (核心修改) 从Python原生列表安全地重建张量
+            # 不再使用torch.cat，而是先展平列表再创建新张量
+            stats = {}
+            # 移除向self.stats添加占位符的逻辑，直接在重建时处理空列表
+            for k, v in self.stats.items():
+                if isinstance(v, list) and len(v) > 0:
+                    # 将列表的列表（List[List]）展平为单个列表
+                    flat_list = [item for sublist in v for item in sublist]
+                    stats[k] = torch.tensor(flat_list)
+                else:
+                    # 如果在验证过程中没有累积任何数据，则创建一个空张量
+                    stats[k] = torch.tensor([])
 
-            # 1. 将列表合并为张量
-            stats = {k: torch.cat(v, 0).cpu().numpy() for k, v in self.stats.items()}
+            # 2. 将重建后的CPU张量转换为numpy，后续流程保持不变
+            stats_np = {k: v.numpy() for k, v in stats.items()}
             
-            # 2. 计算每个类别的统计信息
-            self.nt_per_class = np.bincount(stats["target_cls"].astype(int), minlength=self.nc)
+            # 确保关键键存在，以防验证集为空
+            stats_np.setdefault("target_cls", np.array([], dtype=int))
+            stats_np.setdefault("tp", np.array([]))
+
+            self.nt_per_class = np.bincount(stats_np["target_cls"].astype(int), minlength=self.nc)
             
-            # 3. 计算每张图像的目标数量
-            if len(stats["target_img"]) > 0:
-                self.nt_per_image = np.bincount(stats["target_img"].astype(int), minlength=self.nc)
-            else:
-                self.nt_per_image = np.zeros(self.nc)
-                
-            # 4. 从stats中移除target_img，因为后续处理不需要
-            stats.pop("target_img", None)
+            # target_img的处理保持不变
+            if "target_img" in stats_np and len(stats_np["target_img"]) > 0:
+                self.nt_per_image = np.bincount(stats_np["target_img"].astype(int), minlength=len(self.dataloader.dataset.im_files))
+            
+            stats_np.pop("target_img", None)
             
             # 5. 处理tp、conf等计算mAP
-            if len(stats) and stats["tp"].any():
-                self.metrics.process(**stats)
+            if stats_np["tp"].any():
+                self.metrics.process(**stats_np)
                 
             # 6. 计算番茄特定指标
             self.metrics.finalize_h_pos_metrics()
-            h_mae = self.metrics.h_pos_stats.get('h_mae', 0.0)
-            rank_acc = self.metrics.h_pos_stats.get('rank_acc', 0.0)
             
-            # 7. 更新结果字典
+            # 7. 更新结果字典并返回
             results = self.metrics.results_dict
-            results['metrics/h_mae'] = h_mae
-            results['metrics/rank_acc'] = rank_acc
+            # h_mae和rank_acc应该已经由self.metrics.results_dict提供，无需手动添加
             
             return results
             
@@ -848,35 +751,22 @@ class TomatoValidator(DetectionValidator):
             LOGGER.warning(f"错误详情: {traceback.format_exc()}")
             # 返回最小化的结果字典，避免完全失败
             return {
-                'metrics/precision': 0.0,
-                'metrics/recall': 0.0,
-                'metrics/mAP50': 0.0,
-                'metrics/mAP50-95': 0.0,
-                'metrics/h_mae': 0.0,
-                'metrics/rank_acc': 0.0
+                'metrics/precision(B)': 0.0, 'metrics/recall(B)': 0.0, 'metrics/mAP50(B)': 0.0, 
+                'metrics/mAP50-95(B)': 0.0, 'metrics/h_mae': 0.0, 'metrics/rank_acc': 0.0, 'fitness': 0.0
             }
         
     def finalize_metrics(self, *args, **kwargs):
-        """完成指标计算，添加h_pos评估和排序指标。"""
-        # 调用父类方法处理常规检测指标
+        """完成指标计算。核心计算由get_stats完成，此方法主要用于日志记录。"""
+        # 调用父类方法，这将触发上方我们修改过的 get_stats() 方法
         super().finalize_metrics(*args, **kwargs)
         
-        # 使用TomatoMetrics的finalize_h_pos_metrics方法
-        self.metrics.finalize_h_pos_metrics()
-        
-        # 添加h_pos指标到结果中
+        # 此刻，self.metrics.results_dict 已经包含了所有最终结果
         h_mae = self.metrics.h_pos_stats.get('h_mae', 0.0)
         rank_acc = self.metrics.h_pos_stats.get('rank_acc', 0.0)
         
-        # 创建一个新的字典来存储结果，而不是尝试修改父类方法的返回值
-        metrics = {}
-        metrics['metrics/h_mae'] = h_mae
-        metrics['metrics/rank_acc'] = rank_acc
-        
+        # 只需记录日志即可，无需返回或修改任何内容
         LOGGER.info(f"H-pos MAE: {h_mae:.4f}")
         LOGGER.info(f"H-pos Ranking Accuracy: {rank_acc:.4f}")
-        
-        return metrics
         
     def get_desc(self):
         """返回格式化的字符串，总结YOLO模型的类指标。"""
